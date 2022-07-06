@@ -1,7 +1,7 @@
 package com.tutorial.weatheria
 
-import com.tutorial.weatheria.networkmodels.SearchLocationResponse
-import com.tutorial.weatheria.networkmodels.WeatherResponse
+import com.tutorial.weatheria.network_and_data_models.SearchLocationResponse
+import com.tutorial.weatheria.network_and_data_models.WeatherResponse
 import retrofit2.Response
 import retrofit2.http.GET
 import retrofit2.http.Query

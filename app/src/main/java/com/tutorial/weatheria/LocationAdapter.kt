@@ -7,10 +7,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.tutorial.weatheria.databinding.SearchLocationViewHolderBinding
-import com.tutorial.weatheria.databinding.TestingRecentViewHolderBinding
-import com.tutorial.weatheria.databinding.TestingViewHolderBinding
-import com.tutorial.weatheria.networkmodels.Location
-import com.tutorial.weatheria.networkmodels.SearchLocationResponseItem
+import com.tutorial.weatheria.network_and_data_models.SearchLocationResponseItem
 
 class LocationAdapter:ListAdapter<SearchLocationResponseItem,LocationAdapter.ViewHolder>(diffObject) {
     inner class ViewHolder(view: View):RecyclerView.ViewHolder(view) {

@@ -57,6 +57,6 @@
         tools:layout="@layout/fragment_weather_details" >
         <argument
             android:name="locationDetails"
-            app:argType="com.tutorial.weatheria.networkmodels.SearchLocationResponseItem" />
+            app:argType="com.tutorial.weatheria.network_and_data_models.SearchLocationResponseItem" />
     </fragment>
 </navigation>

@@ -8,10 +8,7 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
 import com.tutorial.weatheria.databinding.HourlyViewHolderBinding
-import com.tutorial.weatheria.databinding.TestingTodayViewHolderBinding
-import com.tutorial.weatheria.databinding.TestingViewHolderBinding
-import com.tutorial.weatheria.networkmodels.Forecastday
-import com.tutorial.weatheria.networkmodels.Hour
+import com.tutorial.weatheria.network_and_data_models.Forecastday
 import java.text.SimpleDateFormat
 import java.util.*
 

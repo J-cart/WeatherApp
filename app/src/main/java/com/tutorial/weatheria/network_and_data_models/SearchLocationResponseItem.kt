@@ -1,23 +1,24 @@
-package com.tutorial.weatheria.networkmodels
+package com.tutorial.weatheria.network_and_data_models
 
 
+import android.os.Parcelable
 import com.google.gson.annotations.SerializedName
+import kotlinx.parcelize.Parcelize
 
-data class Location(
+@Parcelize
+data class SearchLocationResponseItem(
     @SerializedName("country")
     val country: String,
+    @SerializedName("id")
+    val id: Int,
     @SerializedName("lat")
     val lat: Double,
-    @SerializedName("localtime")
-    val localtime: String,
-    @SerializedName("localtime_epoch")
-    val localtimeEpoch: Int,
     @SerializedName("lon")
     val lon: Double,
     @SerializedName("name")
     val name: String,
     @SerializedName("region")
     val region: String,
-    @SerializedName("tz_id")
-    val tzId: String
-)
+    @SerializedName("url")
+    val url: String
+):Parcelable

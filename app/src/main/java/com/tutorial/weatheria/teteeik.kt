@@ -1,7 +1,6 @@
 package com.tutorial.weatheria
 
 import android.Manifest
-import android.app.Application
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
@@ -13,9 +12,8 @@ import androidx.core.app.ActivityCompat
 import androidx.room.TypeConverter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
-import com.tutorial.weatheria.networkmodels.Day
-import com.tutorial.weatheria.networkmodels.Hour
-import dagger.hilt.android.qualifiers.ApplicationContext
+import com.tutorial.weatheria.network_and_data_models.Day
+import com.tutorial.weatheria.network_and_data_models.Hour
 
 class cb(val context: Context,val application: AppCompatActivity){
      fun checkPerms(): Boolean {

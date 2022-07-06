@@ -2,9 +2,9 @@ package com.tutorial.weatheria.db
 
 import androidx.room.TypeConverter
 import com.google.gson.Gson
-import com.tutorial.weatheria.networkmodels.Current
-import com.tutorial.weatheria.networkmodels.Forecast
-import com.tutorial.weatheria.networkmodels.Location
+import com.tutorial.weatheria.network_and_data_models.Current
+import com.tutorial.weatheria.network_and_data_models.Forecast
+import com.tutorial.weatheria.network_and_data_models.Location
 
 class Converters {
     @TypeConverter

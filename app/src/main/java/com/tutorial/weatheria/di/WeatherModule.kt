@@ -7,6 +7,7 @@ import com.google.gson.GsonBuilder
 import com.tutorial.weatheria.WeatherService
 import com.tutorial.weatheria.arch.MainRepository
 import com.tutorial.weatheria.arch.WeatherRepositoryImpl
+import com.tutorial.weatheria.db.SavedWeatherDao
 import com.tutorial.weatheria.db.WeatherDao
 import com.tutorial.weatheria.db.WeatherDataBase
 import dagger.Module
@@ -27,6 +28,7 @@ object WeatherModule {
     @Singleton
     @Provides
     fun getDao(db: WeatherDataBase): WeatherDao = db.weatherDao()
+    fun getSavedDao(db: WeatherDataBase): SavedWeatherDao = db.savedWeatherDao()
 
     @Singleton
     @Provides
@@ -47,7 +49,7 @@ object WeatherModule {
 
     @Singleton
     @Provides
-    fun getMainRepImpl(api: WeatherService):MainRepository = WeatherRepositoryImpl(api)
+    fun getMainRepImpl(api: WeatherService,db: WeatherDataBase):MainRepository = WeatherRepositoryImpl(api,db)
 
 
 

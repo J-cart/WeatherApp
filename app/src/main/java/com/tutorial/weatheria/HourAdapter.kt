@@ -7,13 +7,10 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import coil.Coil
 import coil.load
-import com.bumptech.glide.Glide
 import com.tutorial.weatheria.databinding.TestingTodayViewHolderBinding
 import com.tutorial.weatheria.databinding.TestingViewHolderBinding
-import com.tutorial.weatheria.networkmodels.Forecastday
-import com.tutorial.weatheria.networkmodels.Hour
+import com.tutorial.weatheria.network_and_data_models.Hour
 
 class HourAdapter: ListAdapter<Hour, HourAdapter.ViewHolder2>(diffObject) {
     inner class ViewHolder(view: View): RecyclerView.ViewHolder(view) {

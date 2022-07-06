@@ -3,11 +3,14 @@ package com.tutorial.weatheria.arch
 import android.util.Log
 import com.tutorial.weatheria.Resource
 import com.tutorial.weatheria.WeatherService
-import com.tutorial.weatheria.networkmodels.SearchLocationResponse
-import com.tutorial.weatheria.networkmodels.WeatherResponse
+import com.tutorial.weatheria.db.WeatherDataBase
+import com.tutorial.weatheria.network_and_data_models.SavedWeather
+import com.tutorial.weatheria.network_and_data_models.SearchLocationResponse
+import com.tutorial.weatheria.network_and_data_models.WeatherResponse
+import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-class WeatherRepositoryImpl @Inject constructor(val api: WeatherService) : MainRepository {
+class WeatherRepositoryImpl @Inject constructor(val api: WeatherService,val db:WeatherDataBase) : MainRepository {
     override suspend fun getWeatherForecast(
         location: String,
         days: Int
@@ -53,4 +56,16 @@ class WeatherRepositoryImpl @Inject constructor(val api: WeatherService) : MainR
             Resource.Failure("AN EXCEPTION OCCURRED <---> ${e.message}")
         }
     }
+
+    //REGULAR FORECAST
+    override suspend fun getAllWeatherFromDb(): WeatherResponse = db.weatherDao().getWeatherResponse()
+    override suspend fun insertAllWeather(weatherResponse: WeatherResponse) = db.weatherDao().insertWeatherResponse(weatherResponse)
+    override suspend fun deleteAllWeather() = db.weatherDao().deleteAll()
+
+
+    //SAVED WEATHER
+    override suspend fun getAllSavedWeather(): Flow<List<SavedWeather>> = db.savedWeatherDao().getAllSavedWeather()
+    override suspend fun insertAllSavedWeather(savedWeather: SavedWeather) = db.savedWeatherDao().insertWeather(savedWeather)
+    override suspend fun deleteSavedWeather(savedWeather: SavedWeather) = db.savedWeatherDao().deleteSavedWeather(savedWeather)
+    override suspend fun deleteAllSavedWeather() =db.savedWeatherDao().deleteAllSavedWeather()
 }

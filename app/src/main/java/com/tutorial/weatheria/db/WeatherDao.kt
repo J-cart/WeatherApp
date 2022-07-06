@@ -4,7 +4,7 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
-import com.tutorial.weatheria.networkmodels.WeatherResponse
+import com.tutorial.weatheria.network_and_data_models.WeatherResponse
 
 @Dao
 interface WeatherDao {

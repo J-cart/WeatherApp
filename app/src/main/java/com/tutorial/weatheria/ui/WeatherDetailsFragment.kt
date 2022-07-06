@@ -2,10 +2,10 @@ package com.tutorial.weatheria.ui
 
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.navArgs
 import coil.load
@@ -20,9 +20,9 @@ import java.util.*
 class WeatherDetailsFragment : Fragment() {
     private var _binding: FragmentWeatherDetailsBinding? = null
     private val binding get() = _binding!!
-    private val args:WeatherDetailsFragmentArgs by navArgs()
-    private val viewModel:WeatherViewModel by activityViewModels()
-    private  val adapter: HourAdapter by lazy { HourAdapter() }
+    private val args: WeatherDetailsFragmentArgs by navArgs()
+    private val viewModel: WeatherViewModel by activityViewModels()
+    private val adapter: HourAdapter by lazy { HourAdapter() }
 
 
     override fun onCreateView(
@@ -37,14 +37,11 @@ class WeatherDetailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val location = "${args.locationDetails.lat},${args.locationDetails.lon}" //or betterstill pass the name
-        setUpUi(viewModel,location)
-        viewModel.frmDab.observe(viewLifecycleOwner){response->
-            adapter.submitList(response?.forecast?.forecastday?.get(0)?.hour)
-        }
+        setUpUi(viewModel, location)
 
     }
 
-    private fun setUpUi(viewModel: WeatherViewModel,location:String) {
+    private fun setUpUi(viewModel: WeatherViewModel, location: String) {
         viewModel.updateWeatherSearchedLocation(location)
         binding.recentsRv.adapter = adapter
         viewModel.searchLocationWeatherResult.observe(viewLifecycleOwner) { response ->
@@ -53,15 +50,15 @@ class WeatherDetailsFragment : Fragment() {
                     val current = response.data?.current
                     binding.apply {
                         weatherIcon.load("http:${current?.condition?.icon}")
-                        locationTV.text =response.data?.location?.name// current?.lastUpdated
+                        locationTV.text = response.data?.location?.name// current?.lastUpdated
                         dayTv.text = current?.condition?.text
                         val line = checkDateFormat(System.currentTimeMillis())
-                        Log.d("TIMEING","$line")
-                        dateTv.text =checkDateFormat(System.currentTimeMillis())
+                        Log.d("TIMEING", "$line")
+                        dateTv.text = checkDateFormat(System.currentTimeMillis())
                         tempText.text = current?.tempC.toString()
                         humidityText.text = current?.humidity.toString()
                         windText.text = current?.windMph.toString()
-                        //adapter.submitList(  response.data?.forecast?.forecastday?.get(0)?.hour)
+                        adapter.submitList(  response.data?.forecast?.forecastday?.get(0)?.hour)
                         response.data?.forecast?.forecastday?.get(0)?.hour?.get(0)?.condition?.icon
                     }
                 }
@@ -75,7 +72,8 @@ class WeatherDetailsFragment : Fragment() {
             }
         }
     }
-    private fun checkDateFormat(time: Long):String {
+
+    private fun checkDateFormat(time: Long): String {
         val dateFormat = SimpleDateFormat("yy-MM-dd hh:mm:ss", Locale.getDefault())
         return dateFormat.format(time)
     }
