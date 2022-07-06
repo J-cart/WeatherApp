@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/activity_main.xml" value="0.2557291666666667" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/fragment_current_weather.xml" value="0.264" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/fragment_daily_weather_deatails.xml" value="0.2557291666666667" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/fragment_forecast_weather_detail.xml" value="0.2526041666666667" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/fragment_saved_weather.xml" value="0.2557291666666667" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/fragment_search_location.xml" value="0.2" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/fragment_weather_details.xml" value="0.264" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/fragment_weekly_weather_details.xml" value="0.2557291666666667" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/hourly_view_holder.xml" value="0.29501216545012166" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/search_location_view_holder.xml" value="0.2515625" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/testing_recent_view_holder.xml" value="0.2557291666666667" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/testing_today_view_holder.xml" value="0.4" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/testing_view_holder.xml" value="0.2557291666666667" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/today_view_holder.xml" value="0.2937956204379562" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/menu/bottom_nav.xml" value="0.2557291666666667" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

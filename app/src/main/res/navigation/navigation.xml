@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation.xml"
+    app:startDestination="@id/currentWeatherFragment">
+
+    <fragment
+        android:id="@+id/currentWeatherFragment"
+        android:name="com.tutorial.weatheria.ui.CurrentWeatherFragment"
+        android:label="fragment_current_weather"
+        tools:layout="@layout/fragment_current_weather" >
+        <action
+            android:id="@+id/action_currentWeatherFragment_to_forecastWeatherDetailFragment"
+            app:destination="@id/forecastWeatherDetailFragment" />
+        <action
+            android:id="@+id/action_currentWeatherFragment_to_savedWeatherFragment"
+            app:destination="@id/savedWeatherFragment" />
+        <action
+            android:id="@+id/action_currentWeatherFragment_to_searchLocationFragment"
+            app:destination="@id/searchLocationFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/dailyWeatherDeatailsFragment"
+        android:name="com.tutorial.weatheria.ui.DailyWeatherDeatailsFragment"
+        android:label="fragment_daily_weather_deatails"
+        tools:layout="@layout/fragment_daily_weather_deatails" />
+    <fragment
+        android:id="@+id/forecastWeatherDetailFragment"
+        android:name="com.tutorial.weatheria.ui.ForecastWeatherDetailFragment"
+        android:label="fragment_forecast_weather_detail"
+        tools:layout="@layout/fragment_forecast_weather_detail" >
+    </fragment>
+    <fragment
+        android:id="@+id/searchLocationFragment"
+        android:name="com.tutorial.weatheria.ui.SearchLocationFragment"
+        android:label="fragment_search_location"
+        tools:layout="@layout/fragment_search_location" >
+        <action
+            android:id="@+id/action_searchLocationFragment_to_weatherDetailsFragment"
+            app:destination="@id/weatherDetailsFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/savedWeatherFragment"
+        android:name="com.tutorial.weatheria.ui.SavedWeatherFragment"
+        android:label="fragment_saved_weather"
+        tools:layout="@layout/fragment_saved_weather" />
+    <fragment
+        android:id="@+id/weeklyWeatherDetailsFragment"
+        android:name="com.tutorial.weatheria.ui.WeeklyWeatherDetailsFragment"
+        android:label="fragment_weekly_weather_details"
+        tools:layout="@layout/fragment_weekly_weather_details" />
+    <fragment
+        android:id="@+id/weatherDetailsFragment"
+        android:name="com.tutorial.weatheria.ui.WeatherDetailsFragment"
+        android:label="fragment_weather_details"
+        tools:layout="@layout/fragment_weather_details" >
+        <argument
+            android:name="locationDetails"
+            app:argType="com.tutorial.weatheria.networkmodels.SearchLocationResponseItem" />
+    </fragment>
+</navigation>
