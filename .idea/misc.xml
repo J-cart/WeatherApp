@@ -3,6 +3,7 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/drawable/bottom_nav_selector.xml" value="0.1" />
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/activity_main.xml" value="0.2557291666666667" />
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/fragment_current_weather.xml" value="0.264" />
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/fragment_daily_weather_deatails.xml" value="0.2557291666666667" />

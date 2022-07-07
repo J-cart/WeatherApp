@@ -50,6 +50,7 @@ class WeatherViewModel @Inject constructor(
 
     fun updateWeather(location: String) {
         weatherForecast.value = Resource.Loading()
+        situFrmDab.value = Resource.Loading()
         viewModelScope.launch {
             when (val forecast = repository.getWeatherForecast(location = location, 7)) {
                 is Resource.Successful -> {
@@ -59,7 +60,7 @@ class WeatherViewModel @Inject constructor(
                             Log.d("dbtransaction","deleting weather")
                             insertAllWeather(it)
                             Log.d("dbtransaction","inserting weather")
-                            reportDbSitu()
+
                         }
                     }
                 }
@@ -70,6 +71,7 @@ class WeatherViewModel @Inject constructor(
                 }
                 else -> Unit
             }
+            reportDbSitu()
             //getAllWeatherFromDb()
             Log.d("dbtransaction","getting weather")
 

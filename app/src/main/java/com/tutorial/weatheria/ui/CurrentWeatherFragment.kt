@@ -214,11 +214,12 @@ class CurrentWeatherFragment : Fragment() {
         }*/
 
         viewModel.situFrmDab.observe(viewLifecycleOwner) { response ->
-
             when (response) {
                 is Resource.Successful -> {
                     val current = response.data?.current
                     binding.apply {
+                        progressBar.visibility = View.GONE
+                        todayTv.isClickable = true
                         weatherIcon.load("http:${current?.condition?.icon}")
                         locationTV.text = response.data?.location?.name// current?.lastUpdated
                         dayTv.text = current?.condition?.text
@@ -229,11 +230,22 @@ class CurrentWeatherFragment : Fragment() {
                     }
                 }
                 is Resource.Failure -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.todayTv.isClickable = true
                     Toast.makeText(
                         requireContext(),
                         "Weather returns null, check network and refresh",
                         Toast.LENGTH_SHORT
                     ).show()
+                }
+                is Resource.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                    Toast.makeText(
+                        requireContext(),
+                        "Loading , Alaye calm down small na",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    binding.todayTv.isClickable = false
                 }
                 else -> Unit
             }
