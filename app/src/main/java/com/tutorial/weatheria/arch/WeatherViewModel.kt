@@ -1,5 +1,6 @@
 package com.tutorial.weatheria.arch
 
+import android.util.Log
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -11,7 +12,6 @@ import com.tutorial.weatheria.network_and_data_models.SavedWeather
 import com.tutorial.weatheria.network_and_data_models.SearchLocationResponse
 import com.tutorial.weatheria.network_and_data_models.WeatherResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -25,13 +25,59 @@ class WeatherViewModel @Inject constructor(
     val weatherForecast = MutableLiveData<Resource<WeatherResponse>>()
     val searchLocationResult = MutableLiveData<Resource<SearchLocationResponse>>()
     val searchLocationWeatherResult = MutableLiveData<Resource<WeatherResponse>>()
+    //////////////////////REGION FOR STILL CHECKING OUT THE CACHING//////////////////////////////
     val frmDab = MutableLiveData<WeatherResponse>()
+    val situFrmDab = MutableLiveData<Resource<WeatherResponse>>()
     val savedWeatherResult = MutableLiveData<List<SavedWeather>>()
-//    init {
-//        updateWeather()
-//    }
 
 
+    private fun reportDbSitu(){
+        viewModelScope.launch {
+            val isDbEmpty = weatherDao.getSize() < 1
+            when{
+                isDbEmpty->{
+                    situFrmDab.value = Resource.Failure("Db is empty")
+                }
+                else->{
+                    situFrmDab.value = Resource.Successful(repository.getAllWeatherFromDb())
+                }
+
+            }
+        }
+    }
+
+
+
+    fun updateWeather(location: String) {
+        weatherForecast.value = Resource.Loading()
+        viewModelScope.launch {
+            when (val forecast = repository.getWeatherForecast(location = location, 7)) {
+                is Resource.Successful -> {
+                    forecast.data?.let {
+                        db.withTransaction {
+                            deleteAllWeather()
+                            Log.d("dbtransaction","deleting weather")
+                            insertAllWeather(it)
+                            Log.d("dbtransaction","inserting weather")
+                            reportDbSitu()
+                        }
+                    }
+                }
+                is Resource.Failure -> {
+                    forecast.msg?.let {
+                        // TODO
+                    }
+                }
+                else -> Unit
+            }
+            //getAllWeatherFromDb()
+            Log.d("dbtransaction","getting weather")
+
+        }
+    }
+
+    /*
+    THIS IS FOR THE NORMAL REQUEST WITHOUT CACHING!!
     fun updateWeather(location: String) {
         weatherForecast.value = Resource.Loading()
         viewModelScope.launch(Dispatchers.IO) {
@@ -39,10 +85,6 @@ class WeatherViewModel @Inject constructor(
                 is Resource.Successful -> {
                     forecast.data?.let {
                        // weatherForecast.value = Resource.Successful(it)
-                        db.withTransaction {
-                            deleteAllWeather()
-                            insertAllWeather(it)
-                        }
                     }
                 }
                 is Resource.Failure -> {
@@ -55,9 +97,8 @@ class WeatherViewModel @Inject constructor(
                 }
                 else -> Unit
             }
-            getAllWeatherFromDb()
         }
-    }
+    }*/
 
     fun updateLocation(name: String) {
         viewModelScope.launch {

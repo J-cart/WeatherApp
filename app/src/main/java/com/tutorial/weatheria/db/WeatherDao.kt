@@ -16,4 +16,7 @@ interface WeatherDao {
 
     @Query("DELETE FROM weatherResponse")
     suspend fun deleteAll()
+
+    @Query("SELECT COUNT() FROM weatherResponse")
+    suspend fun getSize():Int
 }
