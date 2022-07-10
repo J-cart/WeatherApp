@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.activityViewModels
 import coil.load
 import com.tutorial.weatheria.HourAdapter
@@ -34,6 +35,9 @@ class DailyWeatherDeatailsFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         binding.forecastRV.adapter = adapter
+    }
+
+    private fun onlineLogic(){
         viewModel.weatherForecast.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Successful -> {
@@ -48,5 +52,31 @@ class DailyWeatherDeatailsFragment : Fragment() {
                 else -> Unit
             }
         }
+    }
+    private fun offlineLogic() {
+        viewModel.situFrmDab.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Resource.Successful -> {
+                    val current = response.data?.current
+
+                }
+                is Resource.Failure -> {
+                    val text = "${response.msg}--Weather returns null, check network and refresh"
+                    makeToast(text)
+                }
+                is Resource.Loading -> {
+                    val text = "Alaye wait na abi u wan collect"
+                    makeToast(text)
+                }
+                else -> Unit
+            }
+        }
+    }
+    private fun makeToast(text: String) {
+        Toast.makeText(
+            requireContext(),
+            text,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }

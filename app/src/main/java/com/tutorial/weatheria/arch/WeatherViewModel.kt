@@ -20,25 +20,26 @@ import javax.inject.Inject
 class WeatherViewModel @Inject constructor(
     private val repository: MainRepository,
     private val weatherDao: WeatherDao,
-    private val db:WeatherDataBase
+    private val db: WeatherDataBase
 ) : ViewModel() {
     val weatherForecast = MutableLiveData<Resource<WeatherResponse>>()
     val searchLocationResult = MutableLiveData<Resource<SearchLocationResponse>>()
     val searchLocationWeatherResult = MutableLiveData<Resource<WeatherResponse>>()
+
     //////////////////////REGION FOR STILL CHECKING OUT THE CACHING//////////////////////////////
     val frmDab = MutableLiveData<WeatherResponse>()
     val situFrmDab = MutableLiveData<Resource<WeatherResponse>>()
     val savedWeatherResult = MutableLiveData<List<SavedWeather>>()
 
 
-    private fun reportDbSitu(){
+     fun reportDbSitu() {
         viewModelScope.launch {
             val isDbEmpty = weatherDao.getSize() < 1
-            when{
-                isDbEmpty->{
+            when {
+                isDbEmpty -> {
                     situFrmDab.value = Resource.Failure("Db is empty")
                 }
-                else->{
+                else -> {
                     situFrmDab.value = Resource.Successful(repository.getAllWeatherFromDb())
                 }
 
@@ -47,60 +48,66 @@ class WeatherViewModel @Inject constructor(
     }
 
 
-
-    fun updateWeather(location: String) {
+    fun updateWeather2(location: String) {
         weatherForecast.value = Resource.Loading()
         situFrmDab.value = Resource.Loading()
         viewModelScope.launch {
             when (val forecast = repository.getWeatherForecast(location = location, 7)) {
                 is Resource.Successful -> {
                     forecast.data?.let {
+
                         db.withTransaction {
                             deleteAllWeather()
-                            Log.d("dbtransaction","deleting weather")
+                            Log.d("dbtransaction", "deleting weather")
                             insertAllWeather(it)
-                            Log.d("dbtransaction","inserting weather")
-
+                            Log.d("dbtransaction", "inserting weather")
+                            reportDbSitu()
                         }
                     }
                 }
                 is Resource.Failure -> {
+                    reportDbSitu()
                     forecast.msg?.let {
                         // TODO
                     }
                 }
                 else -> Unit
             }
-            reportDbSitu()
+
             //getAllWeatherFromDb()
-            Log.d("dbtransaction","getting weather")
+            Log.d("dbtransaction", "getting weather")
 
         }
     }
 
-    /*
-    THIS IS FOR THE NORMAL REQUEST WITHOUT CACHING!!
+    //THIS IS FOR THE NORMAL REQUEST WITHOUT CACHING!!
     fun updateWeather(location: String) {
         weatherForecast.value = Resource.Loading()
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             when (val forecast = repository.getWeatherForecast(location = location, 7)) {
                 is Resource.Successful -> {
                     forecast.data?.let {
-                       // weatherForecast.value = Resource.Successful(it)
+                        weatherForecast.value = Resource.Successful(it)
+                        db.withTransaction {
+                            deleteAllWeather()
+                            Log.d("dbtransaction", "deleting weather")
+                            insertAllWeather(it)
+                            Log.d("dbtransaction", "inserting weather")
+                        }
                     }
                 }
                 is Resource.Failure -> {
                     forecast.msg?.let {
-                      //  weatherForecast.value = Resource.Failure(it)
+                        weatherForecast.value = Resource.Failure(it)
                     }
                 }
                 is Resource.Empty -> {
-                    //weatherForecast.value = Resource.Empty()
+                    weatherForecast.value = Resource.Empty()
                 }
                 else -> Unit
             }
         }
-    }*/
+    }
 
     fun updateLocation(name: String) {
         viewModelScope.launch {

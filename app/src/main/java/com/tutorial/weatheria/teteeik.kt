@@ -1,9 +1,16 @@
 package com.tutorial.weatheria
 
 import android.Manifest
+import android.content.BroadcastReceiver
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.ConnectivityManager
+import android.net.Network
+import android.net.NetworkCapabilities
+import android.net.NetworkRequest
 import android.os.Build
+import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -15,8 +22,8 @@ import com.google.gson.Gson
 import com.tutorial.weatheria.network_and_data_models.Day
 import com.tutorial.weatheria.network_and_data_models.Hour
 
-class cb(val context: Context,val application: AppCompatActivity){
-     fun checkPerms(): Boolean {
+class cb(val context: Context, val application: AppCompatActivity) {
+    fun checkPerms(): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
             val is1 = ActivityCompat.checkSelfPermission(
                 context,
@@ -35,8 +42,9 @@ class cb(val context: Context,val application: AppCompatActivity){
             ) == PackageManager.PERMISSION_GRANTED
         }
     }
+
     @RequiresApi(Build.VERSION_CODES.N)
-     val requestLauncher =
+    val requestLauncher =
         application.registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             when {
                 it.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
@@ -62,11 +70,12 @@ class cb(val context: Context,val application: AppCompatActivity){
                 }
             }
         }
+
     @RequiresApi(Build.VERSION_CODES.N)
-     fun requestLocationPermission() {
+    fun requestLocationPermission() {
 
         if (checkPerms()) {
-            Toast.makeText(context,"Permission Granted", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "Permission Granted", Toast.LENGTH_SHORT).show()
         } else {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 requestLauncher.launch(
@@ -88,17 +97,80 @@ class cb(val context: Context,val application: AppCompatActivity){
     }
 
     @TypeConverter
-    fun toHourString(list:List<Hour>):String{
+    fun toHourString(list: List<Hour>): String {
         return Gson().toJson(list)
     }
+
     @TypeConverter
-    fun toHourList(value:String):List<Hour>{
-     return Gson().fromJson(value,Array<Hour>::class.java).toList()
+    fun toHourList(value: String): List<Hour> {
+        return Gson().fromJson(value, Array<Hour>::class.java).toList()
     }
 
-    fun fromStringToDay(string: String):Day{
-       return Gson().fromJson(string,Day::class.java)
+    fun fromStringToDay(string: String): Day {
+        return Gson().fromJson(string, Day::class.java)
     }
 
+
+    enum class NetworkState {
+        CONNECTED,
+        DISCONNECTED
+    }
+    class NetworkReceiver : BroadcastReceiver() {
+        companion object {
+            var isConnected:NetworkState =  NetworkState.CONNECTED
+        }
+        /*declare this in the activity hosting the fragment then pass it to whichever fragment
+        needs it
+               // requireActivity().registerReceiver(cb.NetworkReceiver(),(activity as MainActivity).filter)
+         val filter = IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION)*/
+        @RequiresApi(Build.VERSION_CODES.M)
+        override fun onReceive(p0: Context?, p1: Intent?) {
+            val manager =
+                p0?.getSystemService(ConnectivityManager::class.java) as ConnectivityManager
+            val networkCapabilities = manager.getNetworkCapabilities(manager.activeNetwork)
+
+        isConnected = when {
+                networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true -> {
+                    Log.d("STATE","isConnected")
+                    NetworkState.CONNECTED}
+                networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true ->{
+                    Log.d("STATE","isConnected")
+                    NetworkState.CONNECTED}
+                networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true -> {
+                    Log.d("STATE","isConnected")
+                    NetworkState.CONNECTED}
+                else->{
+                    Log.d("STATE","Disconnected")
+                    NetworkState.DISCONNECTED}
+            }
+        }
+    }
+
+    private fun reqNetwork(){
+        val networkRequest = NetworkRequest.Builder()
+            .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+            .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
+            .addTransportType(NetworkCapabilities.TRANSPORT_CELLULAR)
+            .build()
+
+
+        val networkCallback = object : ConnectivityManager.NetworkCallback() {
+            override fun onAvailable(network: Network) {
+                super.onAvailable(network)
+            }
+
+            override fun onLost(network: Network) {
+                super.onLost(network)
+
+            }
+
+            override fun onUnavailable() {
+                super.onUnavailable()
+
+            }
+        }
+        //networkManager.requestNetwork(networkRequest, networkCallback)
+
+    }
 
 }

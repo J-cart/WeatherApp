@@ -5,6 +5,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
@@ -16,6 +18,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -23,7 +26,6 @@ import coil.load
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.tutorial.weatheria.HourAdapter
 import com.tutorial.weatheria.Resource
 import com.tutorial.weatheria.arch.WeatherViewModel
@@ -32,16 +34,17 @@ import java.text.SimpleDateFormat
 import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.N)
+@SuppressLint("MissingPermission")
 class CurrentWeatherFragment : Fragment() {
     private var _binding: FragmentCurrentWeatherBinding? = null
     private val binding get() = _binding!!
     private val viewModel: WeatherViewModel by activityViewModels()
 
-    // val adapter: ForecastAdapter by lazy { ForecastAdapter() }
     private val adapter: HourAdapter by lazy { HourAdapter() }
-
     private lateinit var fusedLocationProviderClient: FusedLocationProviderClient
     private var userLocation: String? = null
+    private lateinit var networkManager: ConnectivityManager
+
 
     private fun checkDateFormat(time: Long): String {
         val dateFormat = SimpleDateFormat("yy-MM-dd hh:mm:ss", Locale.getDefault())
@@ -74,7 +77,6 @@ class CurrentWeatherFragment : Fragment() {
         }
     }
 
-    @SuppressLint("MissingPermission")
     private fun requestLocation() {
         fusedLocationProviderClient.requestLocationUpdates(
             request,
@@ -96,6 +98,9 @@ class CurrentWeatherFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        fusedLocationProviderClient =
+            LocationServices.getFusedLocationProviderClient(requireContext())//FusedLocationProviderClient(requireContext())
+
         binding.weatherIcon.setOnClickListener {
             val direction =
                 CurrentWeatherFragmentDirections.actionCurrentWeatherFragmentToForecastWeatherDetailFragment()
@@ -108,24 +113,17 @@ class CurrentWeatherFragment : Fragment() {
         }
         binding.recentsRv.adapter = adapter
 
-        fusedLocationProviderClient =
-            LocationServices.getFusedLocationProviderClient(requireContext())//FusedLocationProviderClient(requireContext())
-        assertPerms()
-        userLocation?.let { it1 -> setUpUi2(viewModel, it1) }
-        //wholeLogic()
-        binding.todayTv.setOnClickListener { //TODO THIS REFRESHES THE APP
-            if (!checkPerms()) {
-                Toast.makeText(
-                    requireContext(),
-                    "No permission, activate and refresh",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return@setOnClickListener
-            }
-            assertPerms()
-            userLocation?.let { it1 -> setUpUi2(viewModel, it1) }
-            //wholeLogic()
+        networkManager =
+            activity?.getSystemService(ConnectivityManager::class.java) as ConnectivityManager
+
+        // networkCapabilities = networkManager.getNetworkCapabilities(networkManager.activeNetwork)
+
+        doNetworkOperation()//wholeLogicTest()
+        binding.todayTv.setOnClickListener {
+
+            doNetworkOperation()//wholeLogicTest()
         }
+
     }
 
     override fun onPause() {
@@ -135,12 +133,10 @@ class CurrentWeatherFragment : Fragment() {
 
     override fun onResume() {
         super.onResume()
+        //TODO check network state too
         if (!checkGps()) {
-            Toast.makeText(
-                requireContext(),
-                "No permission, activate and refresh",
-                Toast.LENGTH_SHORT
-            ).show()
+            val text = "No permission, activate and refresh"
+            makeToast(text)
             return
         }
         fusedLocationProviderClient =
@@ -148,19 +144,19 @@ class CurrentWeatherFragment : Fragment() {
 
     }
 
-/*
     private fun setUpUi(viewModel: WeatherViewModel, location: String) {
         viewModel.updateWeather(location)
         viewModel.weatherForecast.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Successful -> {
+                    binding.progressBar.isVisible = false
                     val current = response.data?.current
                     binding.apply {
                         weatherIcon.load("http:${current?.condition?.icon}")
                         locationTV.text = response.data?.location?.name// current?.lastUpdated
                         dayTv.text = current?.condition?.text
                         val line = checkDateFormat(System.currentTimeMillis())
-                        Log.d("TIMEING", "$line")
+                        Log.d("TIME-ING", "$line")
                         dateTv.text = checkDateFormat(System.currentTimeMillis())
                         tempText.text = current?.tempC.toString()
                         humidityText.text = current?.humidity.toString()
@@ -171,240 +167,55 @@ class CurrentWeatherFragment : Fragment() {
 
                 }
                 is Resource.Failure -> {
+                    binding.progressBar.isVisible = false
                     binding.locationTV.text = response.msg
                 }
-                is Resource.Empty -> {
-                    binding.locationTV.text = "LIST IS FRIGGING EMPTY"
-                }
-                else -> Unit
-            }
-        }
-    }
-*/
-
-    private fun setUpUi2(viewModel: WeatherViewModel, location: String) {
-        viewModel.updateWeather(location)
-        /*
-        DIDN'T WORK SO I THOUGHT OF USING THE RESOURCE<T> AS A WRAPPER TO OBSERVE THE RESULT
-        viewModel.frmDab.observe(viewLifecycleOwner) { weather ->
-            Log.d("setupUi", " $weather")
-            if (weather.id < 0) {
-                Toast.makeText(
-                    requireContext(),
-                    "Weather returns null, check network and refresh",
-                    Toast.LENGTH_SHORT
-                ).show()
-                return@observe
-            }
-            val current = weather.current
-            binding.apply {
-                weatherIcon.load("http:${current.condition.icon}")
-                locationTV.text = weather.location.name// current?.lastUpdated
-                dayTv.text = current.condition.text
-                val line = checkDateFormat(System.currentTimeMillis())
-                Log.d("TIMEING", "$line")
-                dateTv.text = checkDateFormat(System.currentTimeMillis())
-                tempText.text = current.tempC.toString()
-                humidityText.text = current.humidity.toString()
-                windText.text = current.windMph.toString()
-            }
-            // response.data?.forecast?.forecastday
-            adapter.submitList(weather.forecast.forecastday[0].hour)
-
-        }*/
-
-        viewModel.situFrmDab.observe(viewLifecycleOwner) { response ->
-            when (response) {
-                is Resource.Successful -> {
-                    val current = response.data?.current
-                    binding.apply {
-                        progressBar.visibility = View.GONE
-                        todayTv.isClickable = true
-                        weatherIcon.load("http:${current?.condition?.icon}")
-                        locationTV.text = response.data?.location?.name// current?.lastUpdated
-                        dayTv.text = current?.condition?.text
-                        dateTv.text = checkDateFormat(System.currentTimeMillis())
-                        tempText.text = current?.tempC.toString()
-                        humidityText.text = current?.humidity.toString()
-                        windText.text = current?.windMph.toString()
-                    }
-                }
-                is Resource.Failure -> {
-                    binding.progressBar.visibility = View.GONE
-                    binding.todayTv.isClickable = true
-                    Toast.makeText(
-                        requireContext(),
-                        "Weather returns null, check network and refresh",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
                 is Resource.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
-                    Toast.makeText(
-                        requireContext(),
-                        "Loading , Alaye calm down small na",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    binding.todayTv.isClickable = false
+                    //binding.locationTV.text = "LIST IS FRIGGING EMPTY"
+                    binding.progressBar.isVisible = true
                 }
                 else -> Unit
             }
         }
-
     }
-
-    @SuppressLint("MissingPermission")
-    private fun assertPerms() {
-        if (!checkPerms()) {
-            MaterialAlertDialogBuilder(requireContext()).apply {
-                setMessage("You need to allow permission for app to work  go to settings to enable permission, Please refresh/restart the app when accepted")
-                setTitle("ACCEPT PERMISSION REQUEST")
-                setPositiveButton("OK") { dialogInterface, int ->
-                    requestLocationPermission(requireView())
-                    dialogInterface.dismiss() // or you can request permission again
-                }
-                create()
-                show()
-            }
-
-        } else {
-            //requestLocationPermission(requireView())
-            if (checkGps()) {
-                fusedLocationProviderClient.lastLocation.addOnCompleteListener(
-                    OnCompleteListener {
-                        if (it.result == null) {
-                            requestLocation()
-                        } else {
-                            Log.d("LOCATING", "LastLocation()  ${it.result}")
-                            binding.todayTv.text =
-                                "${it.result.latitude},${it.result.longitude}"
-                            userLocation = "${it.result.latitude},${it.result.longitude}"
-                            //?:setUpUi2(viewModel,"")
-                        }
-                    })
-            } else {
-                MaterialAlertDialogBuilder(requireContext()).apply {
-                    setMessage("You need to allow permission for app to work  go to settings to enable permission")
-                    setTitle("ON GPS BRUH!")
-                    setPositiveButton("OK") { dialogInterface, int ->
-                        dialogInterface.dismiss() // or you can request permission again
-                    }
-                    create()
-                    show()
-                }
-            }
-        }
-    }
-
-
-    /*
-    THIS REGION IS FOR THE NORMAL REQUEST WITHOUT CACHING!! works fine until i got the idea of caching😭😭😭😭
-
-    private fun assertPerms() {
-        if (!checkPerms()) {
-            MaterialAlertDialogBuilder(requireContext()).apply {
-                setMessage("You need to allow permission for app to work  go to settings to enable permission")
-                setTitle("ACCEPT PERMISSION REQUEST")
-                setPositiveButton("OK") { dialogInterface, int ->
-                    requestLocationPermission(requireView())
-                    dialogInterface.dismiss() // or you can request permission again
-                }
-                create()
-                show()
-            }
-        } else {
-            requestLocationPermission(requireView()) // or do the normal task since this  is redundant
-        }
-    }
-
-    @SuppressLint("MissingPermission")
-    private fun wholeLogic() {
-        when (checkPerms()) {
-            true -> {
-                if (checkGps()) {
-                    fusedLocationProviderClient.lastLocation.addOnCompleteListener(
-                        OnCompleteListener {
-                            if (it.result == null) {
-                                requestLocation()
-                            } else {
-                                Log.d("LOCATING", "LastLocation()  ${it.result}")
-                                binding.todayTv.text =
-                                    "${it.result.latitude},${it.result.longitude}"
-                                userLocation = "${it.result.latitude},${it.result.longitude}"
-                                userLocation?.let { location ->
-                                    setUpUi(viewModel, location)
-                                } //?:setUpUi2(viewModel,"")
-                            }
-                        })
-                } else {
-                    MaterialAlertDialogBuilder(requireContext()).apply {
-                        setMessage("You need to allow permission for app to work  go to settings to enable permission")
-                        setTitle("ON GPS BRUH")
-                        setPositiveButton("OK") { dialogInterface, int ->
-                            dialogInterface.dismiss() // or you can request permission again
-                        }
-                        create()
-                        show()
-                    }
-                }
-            }
-            else -> {
-                binding.todayTv.text = "Check permissions"
-            }
-        }
-    }*/
 
 
     private val requestLauncher =
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             when {
                 it.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                    requestLocationPermission(requireView())
+                    runGpsAndMainOperation()
                 }
                 it.getOrDefault(Manifest.permission.ACCESS_BACKGROUND_LOCATION, false) -> {
-                    requestLocationPermission(requireView())
+                    runGpsAndMainOperation()
                 }
                 it.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                    requestLocationPermission(requireView())
+                    runGpsAndMainOperation()
                 }
                 else -> {
-
-                    MaterialAlertDialogBuilder(requireContext()).apply {
-                        setMessage("You need to allow permission for app to work ")
-                        setTitle("ACCEPT PERMISSION REQUEST")
-                        setPositiveButton("OK") { dialogInterface, Int ->
-                            dialogInterface.dismiss() // or you can request permission again
-                        }
-                        create()
-                        show()
-                    }
+                    val title = "ACCEPT PERMISSION REQUEST"
+                    val text = "You need to allow permission for app to work "
+                    makeSnack(title, text)
                 }
             }
         }
 
-    private fun requestLocationPermission(view: View): Boolean {
-
-        if (checkPerms()) {
-            Snackbar.make(view, " Permission  granted", Snackbar.LENGTH_SHORT).show()
-            return true
+    private fun requestLocationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            requestLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_BACKGROUND_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                )
+            )
         } else {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                requestLauncher.launch(
-                    arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_BACKGROUND_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    )
+            requestLauncher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
                 )
-            } else {
-                requestLauncher.launch(
-                    arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    )
-                )
-            }
-            return false
+            )
         }
     }
 
@@ -428,5 +239,124 @@ class CurrentWeatherFragment : Fragment() {
         }
     }
 
+
+    private fun assertPerms() {
+        MaterialAlertDialogBuilder(requireContext()).apply {
+            setMessage("You need to allow permission for app to work  go to settings to enable permission then refresh app")
+            setTitle("ACCEPT PERMISSION REQUEST")
+            setPositiveButton("OK") { dialogInterface, int ->
+                requestLocationPermission()
+                dialogInterface.dismiss()
+            }
+            create()
+            show()
+        }
+    }
+
+    private fun runGpsAndMainOperation() {
+        if (checkGps()) {
+            fusedLocationProviderClient.lastLocation.addOnCompleteListener(
+                OnCompleteListener {
+                    if (it.result == null) {
+                        requestLocation()
+                    } else {
+                        Log.d("LOCATING", "LastLocation()  ${it.result}")
+                        binding.todayTv.text =
+                            "${it.result.latitude},${it.result.longitude}"
+                        userLocation = "${it.result.latitude},${it.result.longitude}"
+                        setUpUi(viewModel, userLocation!!)
+                    }
+
+                })
+        } else {
+            val title =
+                "You need to allow permission for app to work  go to settings to enable permission"
+            val text = "ON GPS BRUH"
+            makeSnack(title, text)
+        }
+    }
+
+
+    private fun wholeLogic() {
+        when (checkPerms()) {
+            true -> {
+                runGpsAndMainOperation()
+            }
+            false -> {
+                assertPerms()
+            }
+        }
+    }
+
+    private fun doNetworkOperation() {
+        if (isConnected()) {
+            wholeLogic()
+        } else {
+            offlineWholeLogic()
+        }
+    }
+
+    private fun offlineWholeLogic() {
+        viewModel.reportDbSitu()
+        viewModel.situFrmDab.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Resource.Successful -> {
+                    val current = response.data?.current
+                    binding.apply {
+                        progressBar.visibility = View.GONE
+                        todayTv.isClickable = true
+                        weatherIcon.load("http:${current?.condition?.icon}")
+                        locationTV.text =
+                            response.data?.location?.name// current?.lastUpdated
+                        dayTv.text = current?.condition?.text
+                        dateTv.text = checkDateFormat(System.currentTimeMillis())
+                        tempText.text = current?.tempC.toString()
+                        humidityText.text = current?.humidity.toString()
+                        windText.text = current?.windMph.toString()
+                    }
+                }
+                is Resource.Failure -> {
+                    binding.progressBar.visibility = View.GONE
+                    binding.todayTv.isClickable = true
+                    val text = "${response.msg}--Weather returns null, check network and refresh"
+                    makeToast(text)
+                }
+                is Resource.Loading -> {
+                    binding.progressBar.visibility = View.VISIBLE
+                    val text = "Loading , Alaye calm down small na"
+                    makeToast(text)
+                    binding.todayTv.isClickable = false
+                }
+                else -> Unit
+            }
+        }
+    }
+
+    private fun isConnected(): Boolean {
+        val network = networkManager.getNetworkCapabilities(networkManager.activeNetwork)
+        return network?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true ||
+                network?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true ||
+                network?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true
+    }
+
+    private fun makeToast(text: String) {
+        Toast.makeText(
+            requireContext(),
+            text,
+            Toast.LENGTH_SHORT
+        ).show()
+    }
+
+    private fun makeSnack(title: String, text: String) {
+        MaterialAlertDialogBuilder(requireContext()).apply {
+            setMessage(text)
+            setTitle(title)
+            setPositiveButton("OK") { dialogInterface, int ->
+                dialogInterface.dismiss()
+            }
+            create()
+            show()
+        }
+    }
 }
 
