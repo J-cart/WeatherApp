@@ -111,6 +111,10 @@ class CurrentWeatherFragment : Fragment() {
                 CurrentWeatherFragmentDirections.actionCurrentWeatherFragmentToSearchLocationFragment()
             findNavController().navigate(navigate)
         }
+        binding.windText.setOnClickListener {
+            val navigate = CurrentWeatherFragmentDirections.actionCurrentWeatherFragmentToSavedWeatherFragment()
+            findNavController().navigate(navigate)
+        }
         binding.recentsRv.adapter = adapter
 
         networkManager =
@@ -313,6 +317,7 @@ class CurrentWeatherFragment : Fragment() {
                         tempText.text = current?.tempC.toString()
                         humidityText.text = current?.humidity.toString()
                         windText.text = current?.windMph.toString()
+                        adapter.submitList(response.data?.forecast?.forecastday?.get(0)?.hour)
                     }
                 }
                 is Resource.Failure -> {

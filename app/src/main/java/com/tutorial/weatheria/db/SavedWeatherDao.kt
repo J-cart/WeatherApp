@@ -16,6 +16,12 @@ interface SavedWeatherDao {
     @Delete
     suspend fun deleteSavedWeather(savedWeather: SavedWeather)
 
+    @Query("SELECT COUNT() FROM weatherResponse")
+    suspend fun getSavedSize():Int
+
     @Query("DELETE FROM saved_weather")
     suspend fun deleteAllSavedWeather()
+
+    @Update
+    suspend fun updateSavedWeather(savedWeather: SavedWeather)
 }

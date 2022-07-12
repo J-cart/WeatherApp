@@ -13,6 +13,7 @@ import com.tutorial.weatheria.HourAdapter
 import com.tutorial.weatheria.Resource
 import com.tutorial.weatheria.arch.WeatherViewModel
 import com.tutorial.weatheria.databinding.FragmentWeatherDetailsBinding
+import com.tutorial.weatheria.network_and_data_models.SavedWeather
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -60,6 +61,14 @@ class WeatherDetailsFragment : Fragment() {
                         windText.text = current?.windMph.toString()
                         adapter.submitList(  response.data?.forecast?.forecastday?.get(0)?.hour)
                         response.data?.forecast?.forecastday?.get(0)?.hour?.get(0)?.condition?.icon
+                        todayTv.setOnClickListener {
+                            val save = SavedWeather(
+                                location = response.data?.location,
+                                current = response.data?.current
+                            )
+                            //TODO set max size to 10 ..if > 10 restrict adding to db
+                            viewModel.insertSavedWeather(save)
+                        }
                     }
                 }
                 is Resource.Failure -> {
