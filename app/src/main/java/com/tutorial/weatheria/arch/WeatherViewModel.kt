@@ -177,7 +177,6 @@ class WeatherViewModel @Inject constructor(
         viewModelScope.launch {
             val onlineWeatherList = mutableListOf<SavedWeather>()
             db.withTransaction {
-
                 list.forEach { savedWeather ->
                     when (val getWeather =
                         repository.getWeatherForSearchedLocation(savedWeather.location!!.name, 4)) {

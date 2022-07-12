@@ -19,8 +19,8 @@ class HourAdapter: ListAdapter<Hour, HourAdapter.ViewHolder2>(diffObject) {
             binding.apply {
                 currentWdate.text = hour.time
                 currentWcondition.text =  hour.condition.text
-                currentWtempF.text = "${hour.tempF} F``"
-                currentWtempC.text = "${hour.tempC} C``"
+                currentWtempF.text = "${hour.tempF}℉"
+                currentWtempC.text = "${hour.tempC}℃"
             }
         }
 
@@ -35,7 +35,7 @@ inner class ViewHolder2(view: View): RecyclerView.ViewHolder(view) {
                 }
                 val hourIndex = hour.time.split(" ")
                 Log.d("response34","$hourIndex")
-                tempC.text = "${hour.tempC} C``"
+                tempC.text = "${hour.tempC}℃"
                 tempF.text = "${hourIndex[1]} "
             }
         }

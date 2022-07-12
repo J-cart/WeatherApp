@@ -27,7 +27,7 @@ class ForecastAdapter: ListAdapter<Forecastday,ForecastAdapter.ViewHolder>(diffO
                 val dateFormat = SimpleDateFormat("yy-MM-dd",Locale.getDefault())
                 val text = dateFormat.parse("${forecastday.date}")
                 val dateIndex = text.toString().split(" ")
-                tempC.text = "${forecastday.day.avgtempC} C``"
+                tempC.text = "${forecastday.day.avgtempC}℃"
                 tempF.text = forecastday.day.condition.text
                 dateTV.text = forecastday.date // + "${dateIndex[0]..dateIndex[2]}"
             }

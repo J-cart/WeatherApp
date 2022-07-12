@@ -1,50 +1,48 @@
 package com.tutorial.weatheria.ui
 
-import android.Manifest
-import android.annotation.SuppressLint
-import android.content.Context
-import android.content.IntentFilter
-import android.content.pm.PackageManager
-import android.location.LocationManager
-import android.net.ConnectivityManager
-import android.os.Build
 import android.os.Bundle
-import android.os.Looper
-import android.util.Log
-import android.view.View
-import android.widget.Toast
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.app.ActivityCompat
-import androidx.core.content.ContentProviderCompat.requireContext
+import androidx.core.view.isVisible
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.fragment.findNavController
+import androidx.navigation.ui.AppBarConfiguration
+import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
+import androidx.navigation.ui.setupWithNavController
 import com.google.android.gms.location.*
-import com.google.android.gms.tasks.OnCompleteListener
-import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.snackbar.Snackbar
 import com.tutorial.weatheria.R
-import com.tutorial.weatheria.cb
 import com.tutorial.weatheria.databinding.ActivityMainBinding
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
     private lateinit var binding: ActivityMainBinding
-    lateinit var navController: NavController
-    //    lateinit var appBarConfiguration: AppBarConfiguration
+    private lateinit var navController: NavController
+    private lateinit var appBarConfiguration: AppBarConfiguration
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        appBarConfiguration = AppBarConfiguration(
+            setOf(
+                R.id.currentWeatherFragment,
+                R.id.searchLocationFragment,
+                R.id.savedWeatherFragment,
+                R.id.forecastWeatherDetailFragment
+            )
+        )
 
         val fragHost = supportFragmentManager.findFragmentById(R.id.fragHost) as NavHostFragment
         navController = fragHost.findNavController()
 
-        setupActionBarWithNavController(navController)
+        navController.addOnDestinationChangedListener { _, destination, _ ->
+            binding.bottomNav.isVisible =
+                appBarConfiguration.topLevelDestinations.contains(destination.id)
+        }
+
+        setupActionBarWithNavController(navController,appBarConfiguration)
+        binding.bottomNav.setupWithNavController(navController)
     }
 
     override fun onSupportNavigateUp(): Boolean {

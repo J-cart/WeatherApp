@@ -101,20 +101,6 @@ class CurrentWeatherFragment : Fragment() {
         fusedLocationProviderClient =
             LocationServices.getFusedLocationProviderClient(requireContext())//FusedLocationProviderClient(requireContext())
 
-        binding.weatherIcon.setOnClickListener {
-            val direction =
-                CurrentWeatherFragmentDirections.actionCurrentWeatherFragmentToForecastWeatherDetailFragment()
-            findNavController().navigate(direction)
-        }
-        binding.locationTV.setOnClickListener {
-            val navigate =
-                CurrentWeatherFragmentDirections.actionCurrentWeatherFragmentToSearchLocationFragment()
-            findNavController().navigate(navigate)
-        }
-        binding.windText.setOnClickListener {
-            val navigate = CurrentWeatherFragmentDirections.actionCurrentWeatherFragmentToSavedWeatherFragment()
-            findNavController().navigate(navigate)
-        }
         binding.recentsRv.adapter = adapter
 
         networkManager =
@@ -162,7 +148,7 @@ class CurrentWeatherFragment : Fragment() {
                         val line = checkDateFormat(System.currentTimeMillis())
                         Log.d("TIME-ING", "$line")
                         dateTv.text = checkDateFormat(System.currentTimeMillis())
-                        tempText.text = current?.tempC.toString()
+                        tempText.text = "${ current?.tempC }℃"
                         humidityText.text = current?.humidity.toString()
                         windText.text = current?.windMph.toString()
                     }
