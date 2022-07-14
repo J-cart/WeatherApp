@@ -32,7 +32,7 @@ class ForecastWeatherDetailFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val list = listOf<FragmentListWrapper>(
-            FragmentListWrapper(DailyWeatherDeatailsFragment(),"Daily"),
+            FragmentListWrapper(DailyWeatherDetailsFragment(),"Daily"),
             FragmentListWrapper(WeeklyWeatherDetailsFragment(),"Weekly")
         )
 

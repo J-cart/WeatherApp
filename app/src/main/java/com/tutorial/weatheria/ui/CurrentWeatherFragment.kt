@@ -21,7 +21,6 @@ import androidx.core.app.ActivityCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.navigation.fragment.findNavController
 import coil.load
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnCompleteListener
@@ -174,17 +173,17 @@ class CurrentWeatherFragment : Fragment() {
         registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
             when {
                 it.getOrDefault(Manifest.permission.ACCESS_FINE_LOCATION, false) -> {
-                    runGpsAndMainOperation()
+                    doNetworkOperation()
                 }
                 it.getOrDefault(Manifest.permission.ACCESS_BACKGROUND_LOCATION, false) -> {
-                    runGpsAndMainOperation()
+                    doNetworkOperation()
                 }
                 it.getOrDefault(Manifest.permission.ACCESS_COARSE_LOCATION, false) -> {
-                    runGpsAndMainOperation()
+                    doNetworkOperation()
                 }
                 else -> {
                     val title = "ACCEPT PERMISSION REQUEST"
-                    val text = "You need to allow permission for app to work "
+                    val text = "You need to allow permission for app to work, to enable permission go to app settings and accept or relaunch app"
                     makeSnack(title, text)
                 }
             }
@@ -232,7 +231,7 @@ class CurrentWeatherFragment : Fragment() {
 
     private fun assertPerms() {
         MaterialAlertDialogBuilder(requireContext()).apply {
-            setMessage("You need to allow permission for app to work  go to settings to enable permission then refresh app")
+            setMessage("You need to allow permission for app to work properly")
             setTitle("ACCEPT PERMISSION REQUEST")
             setPositiveButton("OK") { dialogInterface, int ->
                 requestLocationPermission()
@@ -261,13 +260,13 @@ class CurrentWeatherFragment : Fragment() {
         } else {
             val title =
                 "You need to allow permission for app to work  go to settings to enable permission"
-            val text = "ON GPS BRUH"
+            val text = "GPS REQUIRED"
             makeSnack(title, text)
         }
     }
 
 
-    private fun wholeLogic() {
+    private fun onlineWholeLogic() {
         when (checkPerms()) {
             true -> {
                 runGpsAndMainOperation()
@@ -280,13 +279,23 @@ class CurrentWeatherFragment : Fragment() {
 
     private fun doNetworkOperation() {
         if (isConnected()) {
-            wholeLogic()
+            onlineWholeLogic()
         } else {
             offlineWholeLogic()
         }
     }
 
     private fun offlineWholeLogic() {
+        when (checkPerms()) {
+            true -> {
+                doOffline()
+            }
+            false -> {
+                assertPerms()
+            }
+        }
+    }
+    private fun doOffline(){
         viewModel.reportDbSitu()
         viewModel.situFrmDab.observe(viewLifecycleOwner) { response ->
             when (response) {
@@ -321,6 +330,7 @@ class CurrentWeatherFragment : Fragment() {
                 else -> Unit
             }
         }
+
     }
 
     private fun isConnected(): Boolean {

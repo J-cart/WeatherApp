@@ -22,7 +22,7 @@
     </fragment>
     <fragment
         android:id="@+id/dailyWeatherDeatailsFragment"
-        android:name="com.tutorial.weatheria.ui.DailyWeatherDeatailsFragment"
+        android:name="com.tutorial.weatheria.ui.DailyWeatherDetailsFragment"
         android:label="fragment_daily_weather_deatails"
         tools:layout="@layout/fragment_daily_weather_deatails" />
     <fragment

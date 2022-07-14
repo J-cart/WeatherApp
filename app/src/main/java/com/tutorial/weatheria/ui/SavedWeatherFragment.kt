@@ -14,6 +14,7 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.tutorial.weatheria.Resource
+import com.tutorial.weatheria.SavedWeatherAdapter
 import com.tutorial.weatheria.arch.WeatherViewModel
 import com.tutorial.weatheria.databinding.FragmentSavedWeatherBinding
 
@@ -48,8 +49,8 @@ class SavedWeatherFragment : Fragment() {
     }
 
     private fun onlineLogic() {
-        val list = viewModel.list
-        viewModel.doOnlineSavedOperation(list)
+
+        viewModel.doOnlineSavedOperation()
         viewModel.onlineSavedWeatherResultTest.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Successful -> {
@@ -78,15 +79,14 @@ class SavedWeatherFragment : Fragment() {
                 }
                 is Resource.Failure -> {
                     binding.progressBar.isVisible = false
-                    val text = "${response.msg}--Weather returns null, check network and refresh"
+                    binding.weekTV.text = "${response.msg} ,check network/Db"
+                    val text = "${response.msg}, check network and refresh"
                     makeToast(text)
                 }
                 is Resource.Loading -> {
                     binding.progressBar.isVisible = true
-                    val text = "Alaye wait na abi u wan collect"
-                    makeToast(text)
                 }
-                else -> Unit
+                else-> Unit
             }
         }
     }

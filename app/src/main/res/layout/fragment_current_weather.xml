@@ -73,7 +73,7 @@
             android:layout_marginStart="24dp"
 
             android:layout_marginTop="16dp"
-            android:text="Temp C``"
+            android:text="Temp ℃"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="@+id/guideline4" />
 
@@ -81,11 +81,10 @@
             android:id="@+id/tempText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginTop="8dp"
             android:text="--/--"
             android:textColor="@color/black"
             android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/guideline3"
             app:layout_constraintEnd_toEndOf="@+id/tempTitle"
             app:layout_constraintStart_toStartOf="@+id/tempTitle"
             app:layout_constraintTop_toBottomOf="@+id/tempTitle" />
@@ -104,11 +103,10 @@
             android:id="@+id/windText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginTop="8dp"
             android:text="--/--"
             android:textColor="@color/black"
             android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/guideline3"
             app:layout_constraintEnd_toEndOf="@+id/windTitle"
             app:layout_constraintStart_toStartOf="@+id/windTitle"
             app:layout_constraintTop_toBottomOf="@+id/windTitle" />
@@ -128,11 +126,10 @@
             android:id="@+id/humidityText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginBottom="24dp"
+            android:layout_marginTop="8dp"
             android:text="--/--"
             android:textColor="@color/black"
             android:textSize="20sp"
-            app:layout_constraintBottom_toTopOf="@+id/guideline3"
             app:layout_constraintEnd_toEndOf="@+id/humidityTitle"
             app:layout_constraintStart_toStartOf="@+id/humidityTitle"
             app:layout_constraintTop_toBottomOf="@+id/humidityTitle" />
@@ -142,7 +139,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
-            app:layout_constraintGuide_begin="463dp" />
+            app:layout_constraintGuide_begin="421dp" />
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/guideline4"

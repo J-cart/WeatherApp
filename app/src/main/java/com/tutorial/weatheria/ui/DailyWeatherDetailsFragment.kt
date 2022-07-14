@@ -20,12 +20,11 @@ import com.tutorial.weatheria.databinding.FragmentCurrentWeatherBinding
 import com.tutorial.weatheria.databinding.FragmentDailyWeatherDeatailsBinding
 import kotlin.time.Duration.Companion.minutes
 @RequiresApi(Build.VERSION_CODES.N)
-class DailyWeatherDeatailsFragment : Fragment() {
+class DailyWeatherDetailsFragment : Fragment() {
     private var _binding: FragmentDailyWeatherDeatailsBinding? = null
     private val binding get() = _binding!!
     private val viewModel: WeatherViewModel by activityViewModels()
-    // val adapter: ForecastAdapter by lazy { ForecastAdapter() }
-    val adapter: HourAdapter by lazy { HourAdapter() }
+    private val adapter: HourAdapter by lazy { HourAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,7 +55,7 @@ class DailyWeatherDeatailsFragment : Fragment() {
                     binding.dayTV.text = response.msg
                 }
                 is Resource.Empty -> {
-                    binding.dayTV.text = "LIST IS FRIGGING EMPTY"
+                    binding.dayTV.text = "LIST IS EMPTY"
                 }
                 else -> Unit
             }
@@ -70,11 +69,11 @@ class DailyWeatherDeatailsFragment : Fragment() {
                     adapter.submitList(response.data?.forecast?.forecastday?.get(0)?.hour)
                 }
                 is Resource.Failure -> {
-                    val text = "${response.msg}--Weather returns null, check network and refresh"
+                    val text = "${response.msg}, check network and refresh"
                     makeToast(text)
                 }
                 is Resource.Loading -> {
-                    val text = "Alaye wait na abi u wan collect"
+                    val text = "Please wait a moment..."
                     makeToast(text)
                 }
                 else -> Unit

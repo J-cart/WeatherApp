@@ -1,4 +1,4 @@
-package com.tutorial.weatheria.ui
+package com.tutorial.weatheria
 
 import android.view.LayoutInflater
 import android.view.View
@@ -7,13 +7,10 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.tutorial.weatheria.R
 import com.tutorial.weatheria.databinding.SavedWeatherViewholderBinding
-import com.tutorial.weatheria.databinding.TestingRecentViewHolderBinding
 import com.tutorial.weatheria.network_and_data_models.SavedWeather
-import com.tutorial.weatheria.network_and_data_models.SearchLocationResponseItem
 
-class SavedWeatherAdapter:ListAdapter<SavedWeather,SavedWeatherAdapter.ViewHolder>(diffObject) {
+class SavedWeatherAdapter:ListAdapter<SavedWeather, SavedWeatherAdapter.ViewHolder>(diffObject) {
     inner class ViewHolder(view: View):RecyclerView.ViewHolder(view) {
         val binding = SavedWeatherViewholderBinding.bind(view)
         fun bind(savedWeather: SavedWeather){

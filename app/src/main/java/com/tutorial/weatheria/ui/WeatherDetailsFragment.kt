@@ -5,8 +5,10 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import coil.load
 import com.tutorial.weatheria.HourAdapter
@@ -14,6 +16,8 @@ import com.tutorial.weatheria.Resource
 import com.tutorial.weatheria.arch.WeatherViewModel
 import com.tutorial.weatheria.databinding.FragmentWeatherDetailsBinding
 import com.tutorial.weatheria.network_and_data_models.SavedWeather
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -37,13 +41,30 @@ class WeatherDetailsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
         val location = "${args.locationDetails.lat},${args.locationDetails.lon}" //or betterstill pass the name
+
+        viewLifecycleOwner.lifecycleScope.launch {
+            viewModel.savingEvents.collect { event->
+                when(event){
+                    is WeatherViewModel.Events.Successful->{
+                        makeToast("Location Saved")
+                    }
+                    is WeatherViewModel.Events.Failure->{
+                        makeToast("Saved location size cannot exceed 5")
+                    }
+                }
+            }
+        }
+
+
         setUpUi(viewModel, location)
 
     }
 
     private fun setUpUi(viewModel: WeatherViewModel, location: String) {
         viewModel.updateWeatherSearchedLocation(location)
+
         binding.recentsRv.adapter = adapter
         viewModel.searchLocationWeatherResult.observe(viewLifecycleOwner) { response ->
             when (response) {
@@ -66,8 +87,8 @@ class WeatherDetailsFragment : Fragment() {
                                 location = response.data?.location,
                                 current = response.data?.current
                             )
-                            //TODO set max size to 10 ..if > 10 restrict adding to db
-                            viewModel.insertSavedWeather(save)
+                            viewModel.saveToDb(save)
+
                         }
                     }
                 }
@@ -85,5 +106,13 @@ class WeatherDetailsFragment : Fragment() {
     private fun checkDateFormat(time: Long): String {
         val dateFormat = SimpleDateFormat("yy-MM-dd hh:mm:ss", Locale.getDefault())
         return dateFormat.format(time)
+    }
+
+    private fun makeToast(text: String) {
+        Toast.makeText(
+            requireContext(),
+            text,
+            Toast.LENGTH_SHORT
+        ).show()
     }
 }

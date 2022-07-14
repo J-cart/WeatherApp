@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.widget.SearchView
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
@@ -35,7 +36,7 @@ class SearchLocationFragment : Fragment() {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (query != null) {
-                    viewModel.updateLocation(query)
+                    viewModel.updateSearchedLocation(query)
                     return true
                 }
                 return false
@@ -49,15 +50,14 @@ class SearchLocationFragment : Fragment() {
         setUpUi()
         adapter.adapterClick {
             val navigate =
-                SearchLocationFragmentDirections.actionSearchLocationFragmentToWeatherDetailsFragment(
-                    it
-                )
+                SearchLocationFragmentDirections.actionSearchLocationFragmentToWeatherDetailsFragment(it)
             findNavController().navigate(navigate)
         }
     }
 
     private fun setUpUi() {
         binding.locationRv.adapter = adapter
+        binding.errorText.isVisible = adapter.itemCount <=0
         viewModel.searchLocationResult.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Successful -> {
@@ -66,8 +66,7 @@ class SearchLocationFragment : Fragment() {
                 is Resource.Failure -> {
                     binding.errorText.text = response.msg
                 }
-                is Resource.Empty -> {
-                }
+                else-> Unit
             }
         }
 

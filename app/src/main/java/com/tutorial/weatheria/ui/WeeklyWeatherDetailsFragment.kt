@@ -24,7 +24,6 @@ class WeeklyWeatherDetailsFragment : Fragment() {
     private var _binding: FragmentWeeklyWeatherDetailsBinding? = null
     private val binding get() = _binding!!
     private val viewModel: WeatherViewModel by activityViewModels()
-    // val adapter: ForecastAdapter by lazy { ForecastAdapter() }
     val adapter: ForecastAdapter by lazy { ForecastAdapter() }
 
     override fun onCreateView(
@@ -58,7 +57,7 @@ class WeeklyWeatherDetailsFragment : Fragment() {
                     binding.dayTV.text = response.msg
                 }
                 is Resource.Empty -> {
-                    binding.dayTV.text = "LIST IS FRIGGING EMPTY"
+                    binding.dayTV.text = "LIST IS EMPTY"
                 }
                 else -> Unit
             }
@@ -73,11 +72,11 @@ class WeeklyWeatherDetailsFragment : Fragment() {
 
                 }
                 is Resource.Failure -> {
-                    val text = "${response.msg}--Weather returns null, check network and refresh"
+                    val text = "${response.msg}, check network and refresh"
                     makeToast(text)
                 }
                 is Resource.Loading -> {
-                    val text = "Alaye wait na abi u wan collect"
+                    val text = "Please wait a moment..."
                     makeToast(text)
                 }
                 else -> Unit

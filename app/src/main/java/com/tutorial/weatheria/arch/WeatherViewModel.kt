@@ -11,8 +11,10 @@ import com.tutorial.weatheria.network_and_data_models.SavedWeather
 import com.tutorial.weatheria.network_and_data_models.SearchLocationResponse
 import com.tutorial.weatheria.network_and_data_models.WeatherResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -25,21 +27,28 @@ class WeatherViewModel @Inject constructor(
     val searchLocationResult = MutableLiveData<Resource<SearchLocationResponse>>()
     val searchLocationWeatherResult = MutableLiveData<Resource<WeatherResponse>>()
 
+    sealed class Events{
+        object Successful:Events()
+        object Failure:Events()
+    }
+    private val _savingEvent = Channel<Events>()
+    val savingEvents = _savingEvent.receiveAsFlow()
+
     //////////////////////REGION FOR STILL CHECKING OUT THE CACHING//////////////////////////////
     val frmDab = MutableLiveData<WeatherResponse>()
     val situFrmDab = MutableLiveData<Resource<WeatherResponse>>()
     val savedWeatherResult = MutableLiveData<List<SavedWeather>>()
     val onlineSavedWeatherResultTest = MutableLiveData<Resource<List<SavedWeather>>>()
     val offLineSavedWeatherResultTest = MutableLiveData<Resource<List<SavedWeather>>>()
-    val list = mutableListOf<SavedWeather>()
+    private val listFromDb = MutableLiveData<ArrayList<SavedWeather>>()
 
     init {
-
         viewModelScope.launch {
             getAllSavedWeather().collect {
-                list.addAll(it)
+                listFromDb.value = it as ArrayList<SavedWeather>
             }
         }
+
     }
 
 
@@ -58,7 +67,7 @@ class WeatherViewModel @Inject constructor(
         }
     }
 
-    //THIS IS FOR THE NORMAL REQUEST WITHOUT CACHING!!...sorry theres caching now
+    //THIS IS FOR THE NORMAL REQUEST WITHOUT CACHING!!...sorry there's caching now
     fun updateWeather(location: String) {
         weatherForecast.value = Resource.Loading()
         viewModelScope.launch {
@@ -87,7 +96,7 @@ class WeatherViewModel @Inject constructor(
         }
     }
 
-    fun updateLocation(name: String) {
+    fun updateSearchedLocation(name: String) {
         viewModelScope.launch {
             searchLocationResult.value = Resource.Loading()
             when (val searchLocation = repository.getSearchedLocation(name)) {
@@ -172,35 +181,49 @@ class WeatherViewModel @Inject constructor(
         }
     }
 
-    fun doOnlineSavedOperation(list: List<SavedWeather>) {
+    private val onlineWeatherList = mutableListOf<SavedWeather>()
+    fun doOnlineSavedOperation() {
         onlineSavedWeatherResultTest.value = Resource.Loading()
+
         viewModelScope.launch {
-            val onlineWeatherList = mutableListOf<SavedWeather>()
-            db.withTransaction {
-                list.forEach { savedWeather ->
-                    when (val getWeather =
-                        repository.getWeatherForSearchedLocation(savedWeather.location!!.name, 4)) {
-                        is Resource.Successful -> {
-                            val location = getWeather.data?.location
-                            val current = getWeather.data?.current
-                            val weather = savedWeather.copy(
-                                location = location,
-                                current = current
-                            )
-                            onlineWeatherList.add(weather)
-                            db.savedWeatherDao().updateSavedWeather(weather)
-                        }
-                        is Resource.Failure -> {
-                            Log.d("savedPRocess", "${getWeather.msg}")
-                        }
-
-                    }
-
+            val isDbEmpty = db.savedWeatherDao().getSavedSize() < 1
+            when {
+                isDbEmpty -> {
+                    onlineSavedWeatherResultTest.value = Resource.Failure("List is empty")
                 }
-                Log.d("savedPRocess", "$onlineWeatherList")
+                else -> {
+                    db.withTransaction {
+                        onlineWeatherList.clear()
+                        listFromDb.value?.forEach { savedWeather ->
+                            when (val getWeather =
+                                repository.getWeatherForSearchedLocation(
+                                    savedWeather.location!!.name,
+                                    4
+                                )) {
+                                is Resource.Successful -> {
+                                    val location = getWeather.data?.location
+                                    val current = getWeather.data?.current
+                                    val weather = savedWeather.copy(
+                                        location = location,
+                                        current = current
+                                    )
+                                    onlineWeatherList.add(weather)
+                                    db.savedWeatherDao().updateSavedWeather(weather)
+                                }
+                                is Resource.Failure -> {
+                                    Log.d("savedProcess", "${getWeather.msg}")
+                                }
+                            }
 
+                        }
+                        Log.d(
+                            "savedProcess",
+                            "list size =${listFromDb.value?.size} online size = ${onlineWeatherList.size}----->>$onlineWeatherList"
+                        )
+                    }
+                    onlineSavedWeatherResultTest.value = Resource.Successful(onlineWeatherList)
+                }
             }
-            onlineSavedWeatherResultTest.value = Resource.Successful(onlineWeatherList)
         }
 
     }
@@ -210,14 +233,36 @@ class WeatherViewModel @Inject constructor(
         viewModelScope.launch {
             val isSavedEmpty = db.savedWeatherDao().getSavedSize() < 1
             when {
-                isSavedEmpty -> offLineSavedWeatherResultTest.value =
-                    Resource.Failure("List is bloody empty")
+                isSavedEmpty -> {
+                    offLineSavedWeatherResultTest.value =
+                        Resource.Failure("List is empty")
+                    Log.d("savedProcess", "less than 0")
+                }
                 else -> {
-                    getAllSavedWeather().collect {
+                    listFromDb.value?.toList()?.let {
                         offLineSavedWeatherResultTest.value = Resource.Successful(it)
                     }
                 }
             }
         }
     }
+
+    fun saveToDb(savedWeather: SavedWeather) {
+        viewModelScope.launch {
+            val savedSize = db.savedWeatherDao().getSavedSize() < 5
+            when {
+                savedSize -> {
+                    insertSavedWeather(savedWeather)
+                    _savingEvent.send(Events.Successful)
+                }
+                else-> {
+                    _savingEvent.send(Events.Failure)
+                    Log.d("size", "failed to save to db")
+                }
+            }
+        }
+    }
+
+
+
 }
