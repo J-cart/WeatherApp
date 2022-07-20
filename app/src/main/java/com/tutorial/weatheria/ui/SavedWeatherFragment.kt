@@ -40,16 +40,26 @@ class SavedWeatherFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         binding.forecastRV.adapter = adapter
+        wholeLogic()
+        adapter.adapterClick {
+            viewModel.deleteSavedWeather(it).also { adapter.submitList(emptyList()) }
+            if (isConnected()) {
+                onlineLogic()
+            } else {
+                offlineLogic()
+            }
+        }
+
+    }
+    private fun wholeLogic(){
         if (isConnected()) {
             onlineLogic()
         } else {
             offlineLogic()
         }
-
     }
 
     private fun onlineLogic() {
-
         viewModel.doOnlineSavedOperation()
         viewModel.onlineSavedWeatherResultTest.observe(viewLifecycleOwner) { response ->
             when (response) {

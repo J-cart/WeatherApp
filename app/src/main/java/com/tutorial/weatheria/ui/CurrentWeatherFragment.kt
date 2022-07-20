@@ -11,9 +11,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -26,6 +24,7 @@ import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutorial.weatheria.HourAdapter
+import com.tutorial.weatheria.R
 import com.tutorial.weatheria.Resource
 import com.tutorial.weatheria.arch.WeatherViewModel
 import com.tutorial.weatheria.databinding.FragmentCurrentWeatherBinding
@@ -71,7 +70,7 @@ class CurrentWeatherFragment : Fragment() {
             super.onLocationResult(p0)
             val location = p0.lastLocation
             Log.d("LOCATING", "Location CallBAck $location")
-            binding.todayTv.text = "$location"
+            //binding.todayTv.text = "$location"
             userLocation = "${location.latitude},${location.longitude}"
         }
     }
@@ -91,6 +90,7 @@ class CurrentWeatherFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentCurrentWeatherBinding.inflate(inflater, container, false)
+        setHasOptionsMenu(true)
         return binding.root
     }
 
@@ -108,11 +108,19 @@ class CurrentWeatherFragment : Fragment() {
         // networkCapabilities = networkManager.getNetworkCapabilities(networkManager.activeNetwork)
 
         doNetworkOperation()//wholeLogicTest()
-        binding.todayTv.setOnClickListener {
 
-            doNetworkOperation()//wholeLogicTest()
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.refresh_menu,menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when(item.itemId){
+            R.id.refreshPage->doNetworkOperation()
         }
-
+        return super.onOptionsItemSelected(item)
     }
 
     override fun onPause() {
@@ -250,8 +258,8 @@ class CurrentWeatherFragment : Fragment() {
                         requestLocation()
                     } else {
                         Log.d("LOCATING", "LastLocation()  ${it.result}")
-                        binding.todayTv.text =
-                            "${it.result.latitude},${it.result.longitude}"
+//                        binding.todayTv.text =
+//                            "${it.result.latitude},${it.result.longitude}"
                         userLocation = "${it.result.latitude},${it.result.longitude}"
                         setUpUi(viewModel, userLocation!!)
                     }

@@ -25,7 +25,7 @@
         android:clipToPadding="false"
         android:orientation="vertical"
         tools:itemCount="5"
-        tools:listitem="@layout/hourly_view_holder"
+        tools:listitem="@layout/daily_forecast_view_holder"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

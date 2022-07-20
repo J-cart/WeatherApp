@@ -10,18 +10,34 @@
         android:id="@+id/searchView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_white_background"
         android:padding="8dp"
-        app:queryHint="Search Location"
         app:iconifiedByDefault="false"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:queryHint="Search Location" />
+
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:progressDrawable="@drawable/loading_anim"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 
     <TextView
         android:id="@+id/errorText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="ERPROJNCEO"
+        android:text="Search Location"
         android:textSize="20sp"
         android:gravity="center"
         android:textColor="@color/black"
@@ -37,7 +53,7 @@
         android:clipToPadding="false"
         android:orientation="horizontal"
         tools:itemCount="5"
-        tools:listitem="@layout/testing_recent_view_holder"
+        android:visibility="invisible"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@id/locationRv"
         app:layout_constraintStart_toStartOf="parent"

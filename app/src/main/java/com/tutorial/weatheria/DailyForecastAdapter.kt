@@ -8,15 +8,12 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
-import com.tutorial.weatheria.databinding.HourlyWeatherViewHolderBinding
+import com.tutorial.weatheria.databinding.DailyForecastViewHolderBinding
 import com.tutorial.weatheria.network_and_data_models.Hour
 
-class HourAdapter : ListAdapter<Hour, HourAdapter.ViewHolder2>(diffObject) {
+class DailyForecastAdapter : ListAdapter<Hour, DailyForecastAdapter.ViewHolder2>(diffObject) {
     inner class ViewHolder2(view: View) : RecyclerView.ViewHolder(view) {
-        val binding = HourlyWeatherViewHolderBinding.bind(view)
-        init {
-
-        }
+        val binding = DailyForecastViewHolderBinding.bind(view)
         fun bind(hour: Hour) {
             binding.apply {
                 weathericon.load("http:${hour.condition.icon}") {
@@ -28,14 +25,13 @@ class HourAdapter : ListAdapter<Hour, HourAdapter.ViewHolder2>(diffObject) {
                 tempC.text = "${hour.tempC}℃"
                 tempF.text = "${hourIndex[1]} "
             }
-
         }
 
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder2 {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.hourly_weather_view_holder, parent, false)
+            .inflate(R.layout.daily_forecast_view_holder, parent, false)
         return ViewHolder2(view)
     }
 
@@ -56,6 +52,4 @@ class HourAdapter : ListAdapter<Hour, HourAdapter.ViewHolder2>(diffObject) {
             }
         }
     }
-
-
 }

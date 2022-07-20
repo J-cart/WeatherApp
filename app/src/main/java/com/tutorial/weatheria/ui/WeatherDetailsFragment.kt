@@ -2,22 +2,26 @@ package com.tutorial.weatheria.ui
 
 import android.os.Bundle
 import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import coil.load
 import com.tutorial.weatheria.HourAdapter
+import com.tutorial.weatheria.R
 import com.tutorial.weatheria.Resource
 import com.tutorial.weatheria.arch.WeatherViewModel
 import com.tutorial.weatheria.databinding.FragmentWeatherDetailsBinding
+import com.tutorial.weatheria.network_and_data_models.Current
+import com.tutorial.weatheria.network_and_data_models.Location
 import com.tutorial.weatheria.network_and_data_models.SavedWeather
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -28,7 +32,7 @@ class WeatherDetailsFragment : Fragment() {
     private val args: WeatherDetailsFragmentArgs by navArgs()
     private val viewModel: WeatherViewModel by activityViewModels()
     private val adapter: HourAdapter by lazy { HourAdapter() }
-
+    private lateinit var location: String
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,21 +40,23 @@ class WeatherDetailsFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         _binding = FragmentWeatherDetailsBinding.inflate(inflater, container, false)
+        setHasOptionsMenu(true)
         return binding.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
-        val location = "${args.locationDetails.lat},${args.locationDetails.lon}" //or betterstill pass the name
+        location =
+            "${args.locationDetails.lat},${args.locationDetails.lon}" //or betterstill pass the name
+        //requireActivity().actionBar?.title = args.locationDetails.name
 
         viewLifecycleOwner.lifecycleScope.launch {
-            viewModel.savingEvents.collect { event->
-                when(event){
-                    is WeatherViewModel.Events.Successful->{
+            viewModel.savingEvents.collect { event ->
+                when (event) {
+                    is WeatherViewModel.Events.Successful -> {
                         makeToast("Location Saved")
                     }
-                    is WeatherViewModel.Events.Failure->{
+                    is WeatherViewModel.Events.Failure -> {
                         makeToast("Saved location size cannot exceed 5")
                     }
                 }
@@ -62,6 +68,19 @@ class WeatherDetailsFragment : Fragment() {
 
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        inflater.inflate(R.menu.refresh_menu, menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.refreshPage -> setUpUi(viewModel, location)
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+
     private fun setUpUi(viewModel: WeatherViewModel, location: String) {
         viewModel.updateWeatherSearchedLocation(location)
 
@@ -69,7 +88,8 @@ class WeatherDetailsFragment : Fragment() {
         viewModel.searchLocationWeatherResult.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Successful -> {
-                    val current = response.data?.current
+                    binding.progressBar.isVisible = false
+                    var current = response.data?.current
                     binding.apply {
                         weatherIcon.load("http:${current?.condition?.icon}")
                         locationTV.text = response.data?.location?.name// current?.lastUpdated
@@ -80,9 +100,9 @@ class WeatherDetailsFragment : Fragment() {
                         tempText.text = current?.tempC.toString()
                         humidityText.text = current?.humidity.toString()
                         windText.text = current?.windMph.toString()
-                        adapter.submitList(  response.data?.forecast?.forecastday?.get(0)?.hour)
+                        adapter.submitList(response.data?.forecast?.forecastday?.get(0)?.hour)
                         response.data?.forecast?.forecastday?.get(0)?.hour?.get(0)?.condition?.icon
-                        todayTv.setOnClickListener {
+                        favorite.setOnClickListener {
                             val save = SavedWeather(
                                 location = response.data?.location,
                                 current = response.data?.current
@@ -93,10 +113,15 @@ class WeatherDetailsFragment : Fragment() {
                     }
                 }
                 is Resource.Failure -> {
+                    binding.progressBar.isVisible = false
                     binding.locationTV.text = response.msg
                 }
                 is Resource.Empty -> {
+                    binding.progressBar.isVisible = false
                     binding.locationTV.text = "LIST IS FRIGGING EMPTY"
+                }
+                is Resource.Loading->{
+                    binding.progressBar.isVisible = true
                 }
                 else -> Unit
             }

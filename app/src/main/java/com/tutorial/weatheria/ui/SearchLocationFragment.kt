@@ -18,9 +18,7 @@ class SearchLocationFragment : Fragment() {
     private var _binding: FragmentSearchLocationBinding? = null
     private val binding get() = _binding!!
     private val viewModel: WeatherViewModel by activityViewModels()
-
-    // val adapter: ForecastAdapter by lazy { ForecastAdapter() }
-    val adapter: LocationAdapter by lazy { LocationAdapter() }
+    private val adapter: LocationAdapter by lazy { LocationAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -36,7 +34,7 @@ class SearchLocationFragment : Fragment() {
         binding.searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
             override fun onQueryTextSubmit(query: String?): Boolean {
                 if (query != null) {
-                    viewModel.updateSearchedLocation(query)
+                    viewModel.updateSearchedLocation(query.trim())
                     return true
                 }
                 return false
@@ -50,26 +48,38 @@ class SearchLocationFragment : Fragment() {
         setUpUi()
         adapter.adapterClick {
             val navigate =
-                SearchLocationFragmentDirections.actionSearchLocationFragmentToWeatherDetailsFragment(it)
+                SearchLocationFragmentDirections.actionSearchLocationFragmentToWeatherDetailsFragment(
+                    it
+                )
             findNavController().navigate(navigate)
         }
     }
 
     private fun setUpUi() {
         binding.locationRv.adapter = adapter
-        binding.errorText.isVisible = adapter.itemCount <=0
         viewModel.searchLocationResult.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Successful -> {
+                    binding.progressBar.isVisible = false
+                    binding.errorText.isVisible = false
                     adapter.submitList(response.data)
                 }
                 is Resource.Failure -> {
+                    binding.progressBar.isVisible = false
+                    binding.errorText.isVisible = true
                     binding.errorText.text = response.msg
                 }
-                else-> Unit
+                is Resource.Empty -> {
+                    binding.progressBar.isVisible = false
+                    binding.errorText.isVisible = true
+                    binding.errorText.text = "No result Found"
+                }
+                is Resource.Loading->{
+                    binding.errorText.isVisible = false
+                    binding.progressBar.isVisible = true
+                }
+                else -> Unit
             }
         }
-
-
     }
 }

@@ -13,7 +13,7 @@ import com.tutorial.weatheria.network_and_data_models.WeatherResponse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -27,10 +27,11 @@ class WeatherViewModel @Inject constructor(
     val searchLocationResult = MutableLiveData<Resource<SearchLocationResponse>>()
     val searchLocationWeatherResult = MutableLiveData<Resource<WeatherResponse>>()
 
-    sealed class Events{
-        object Successful:Events()
-        object Failure:Events()
+    sealed class Events {
+        object Successful : Events()
+        object Failure : Events()
     }
+
     private val _savingEvent = Channel<Events>()
     val savingEvents = _savingEvent.receiveAsFlow()
 
@@ -40,17 +41,6 @@ class WeatherViewModel @Inject constructor(
     val savedWeatherResult = MutableLiveData<List<SavedWeather>>()
     val onlineSavedWeatherResultTest = MutableLiveData<Resource<List<SavedWeather>>>()
     val offLineSavedWeatherResultTest = MutableLiveData<Resource<List<SavedWeather>>>()
-    private val listFromDb = MutableLiveData<ArrayList<SavedWeather>>()
-
-    init {
-        viewModelScope.launch {
-            getAllSavedWeather().collect {
-                listFromDb.value = it as ArrayList<SavedWeather>
-            }
-        }
-
-    }
-
 
     fun reportDbSitu() {
         viewModelScope.launch {
@@ -97,12 +87,14 @@ class WeatherViewModel @Inject constructor(
     }
 
     fun updateSearchedLocation(name: String) {
+        searchLocationResult.value = Resource.Loading()
         viewModelScope.launch {
-            searchLocationResult.value = Resource.Loading()
             when (val searchLocation = repository.getSearchedLocation(name)) {
                 is Resource.Successful -> {
-                    searchLocation.data?.let {
-                        searchLocationResult.value = Resource.Successful(it)
+                    if (searchLocation.data?.isEmpty() == true || searchLocation.data?.size!! <= 0) {
+                        searchLocationResult.value = Resource.Empty()
+                    } else {
+                        searchLocationResult.value = Resource.Successful(searchLocation.data)
                     }
                 }
                 is Resource.Failure -> {
@@ -169,7 +161,7 @@ class WeatherViewModel @Inject constructor(
         }
     }
 
-    private fun deleteSavedWeather(savedWeather: SavedWeather) {
+    fun deleteSavedWeather(savedWeather: SavedWeather) {
         viewModelScope.launch {
             repository.deleteSavedWeather(savedWeather)
         }
@@ -194,7 +186,7 @@ class WeatherViewModel @Inject constructor(
                 else -> {
                     db.withTransaction {
                         onlineWeatherList.clear()
-                        listFromDb.value?.forEach { savedWeather ->
+                        repository.getAllSavedWeather().first().forEach { savedWeather ->
                             when (val getWeather =
                                 repository.getWeatherForSearchedLocation(
                                     savedWeather.location!!.name,
@@ -218,7 +210,7 @@ class WeatherViewModel @Inject constructor(
                         }
                         Log.d(
                             "savedProcess",
-                            "list size =${listFromDb.value?.size} online size = ${onlineWeatherList.size}----->>$onlineWeatherList"
+                            " online size = ${onlineWeatherList.size}----->>$onlineWeatherList"
                         )
                     }
                     onlineSavedWeatherResultTest.value = Resource.Successful(onlineWeatherList)
@@ -239,7 +231,7 @@ class WeatherViewModel @Inject constructor(
                     Log.d("savedProcess", "less than 0")
                 }
                 else -> {
-                    listFromDb.value?.toList()?.let {
+                    repository.getAllSavedWeather().first().toList().let {
                         offLineSavedWeatherResultTest.value = Resource.Successful(it)
                     }
                 }
@@ -255,14 +247,13 @@ class WeatherViewModel @Inject constructor(
                     insertSavedWeather(savedWeather)
                     _savingEvent.send(Events.Successful)
                 }
-                else-> {
+                else -> {
                     _savingEvent.send(Events.Failure)
                     Log.d("size", "failed to save to db")
                 }
             }
         }
     }
-
 
 
 }

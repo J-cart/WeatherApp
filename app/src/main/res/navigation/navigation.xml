@@ -8,8 +8,8 @@
     <fragment
         android:id="@+id/currentWeatherFragment"
         android:name="com.tutorial.weatheria.ui.CurrentWeatherFragment"
-        android:label="fragment_current_weather"
-        tools:layout="@layout/fragment_current_weather" >
+        android:label="Weatheria"
+        tools:layout="@layout/fragment_current_weather">
         <action
             android:id="@+id/action_currentWeatherFragment_to_forecastWeatherDetailFragment"
             app:destination="@id/forecastWeatherDetailFragment" />
@@ -28,14 +28,13 @@
     <fragment
         android:id="@+id/forecastWeatherDetailFragment"
         android:name="com.tutorial.weatheria.ui.ForecastWeatherDetailFragment"
-        android:label="fragment_forecast_weather_detail"
-        tools:layout="@layout/fragment_forecast_weather_detail" >
-    </fragment>
+        android:label="Forecast"
+        tools:layout="@layout/fragment_forecast_weather_detail"></fragment>
     <fragment
         android:id="@+id/searchLocationFragment"
         android:name="com.tutorial.weatheria.ui.SearchLocationFragment"
-        android:label="fragment_search_location"
-        tools:layout="@layout/fragment_search_location" >
+        android:label="Search"
+        tools:layout="@layout/fragment_search_location">
         <action
             android:id="@+id/action_searchLocationFragment_to_weatherDetailsFragment"
             app:destination="@id/weatherDetailsFragment" />
@@ -43,7 +42,7 @@
     <fragment
         android:id="@+id/savedWeatherFragment"
         android:name="com.tutorial.weatheria.ui.SavedWeatherFragment"
-        android:label="fragment_saved_weather"
+        android:label="Saved Location"
         tools:layout="@layout/fragment_saved_weather" />
     <fragment
         android:id="@+id/weeklyWeatherDetailsFragment"
@@ -53,7 +52,7 @@
     <fragment
         android:id="@+id/weatherDetailsFragment"
         android:name="com.tutorial.weatheria.ui.WeatherDetailsFragment"
-        android:label="fragment_weather_details"
+        android:label="Weatheria"
         tools:layout="@layout/fragment_weather_details" >
         <argument
             android:name="locationDetails"

@@ -4,27 +4,25 @@ import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import coil.load
+import com.tutorial.weatheria.DailyForecastAdapter
 import com.tutorial.weatheria.HourAdapter
-import com.tutorial.weatheria.R
 import com.tutorial.weatheria.Resource
 import com.tutorial.weatheria.arch.WeatherViewModel
-import com.tutorial.weatheria.databinding.FragmentCurrentWeatherBinding
 import com.tutorial.weatheria.databinding.FragmentDailyWeatherDeatailsBinding
-import kotlin.time.Duration.Companion.minutes
+
 @RequiresApi(Build.VERSION_CODES.N)
 class DailyWeatherDetailsFragment : Fragment() {
     private var _binding: FragmentDailyWeatherDeatailsBinding? = null
     private val binding get() = _binding!!
     private val viewModel: WeatherViewModel by activityViewModels()
-    private val adapter: HourAdapter by lazy { HourAdapter() }
+    private val adapter: DailyForecastAdapter by lazy { DailyForecastAdapter() }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
