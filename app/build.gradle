@@ -45,6 +45,7 @@ dependencies {
     implementation 'androidx.appcompat:appcompat:1.4.2'
     implementation 'com.google.android.material:material:1.6.1'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    //location manager stuff
     implementation 'com.google.android.gms:play-services-location:19.0.1'
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
@@ -94,8 +95,15 @@ dependencies {
 
     def work_version = "2.7.1"
 
-    // Kotlin + coroutines
+    //workManager  Kotlin + coroutines
     implementation("androidx.work:work-runtime-ktx:$work_version")
+
+    //facebook shimmer
+    implementation 'com.facebook.shimmer:shimmer:0.5.0'
+
+    //kotlin main coroutines
+    implementation"org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
+
 
 
 

@@ -39,4 +39,14 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/weekTV" />
 
+    <include
+        android:id="@+id/shimmerSaved"
+        layout="@layout/shimmer_saved"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/weekTV" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

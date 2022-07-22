@@ -188,6 +188,12 @@
         tools:itemCount="5"
         tools:listitem="@layout/hourly_weather_view_holder" />
 
+
+    <include
+        android:id="@+id/shimmerMeow"
+        android:visibility="invisible"
+        layout="@layout/shimmer_view"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
 
 

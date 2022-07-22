@@ -18,10 +18,8 @@ import com.tutorial.weatheria.databinding.FragmentWeatherDetailsBinding
 import com.tutorial.weatheria.network_and_data_models.Current
 import com.tutorial.weatheria.network_and_data_models.Location
 import com.tutorial.weatheria.network_and_data_models.SavedWeather
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import java.text.SimpleDateFormat
 import java.util.*
 

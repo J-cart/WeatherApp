@@ -70,7 +70,6 @@ class CurrentWeatherFragment : Fragment() {
             super.onLocationResult(p0)
             val location = p0.lastLocation
             Log.d("LOCATING", "Location CallBAck $location")
-            //binding.todayTv.text = "$location"
             userLocation = "${location.latitude},${location.longitude}"
         }
     }
@@ -143,6 +142,7 @@ class CurrentWeatherFragment : Fragment() {
 
     private fun setUpUi(viewModel: WeatherViewModel, location: String) {
         viewModel.updateWeather(location)
+        adapter.submitList(emptyList())
         viewModel.weatherForecast.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Successful -> {
@@ -161,15 +161,18 @@ class CurrentWeatherFragment : Fragment() {
                     }
                     // response.data?.forecast?.forecastday
                     adapter.submitList(response.data?.forecast?.forecastday?.get(0)?.hour)
+                    binding.shimmerMeow.root.isVisible = false
 
                 }
                 is Resource.Failure -> {
                     binding.progressBar.isVisible = false
+                    binding.shimmerMeow.root.isVisible = false
                     binding.locationTV.text = response.msg
                 }
                 is Resource.Loading -> {
                     //binding.locationTV.text = "LIST IS FRIGGING EMPTY"
-                    binding.progressBar.isVisible = true
+                    //binding.progressBar.isVisible = true
+                    binding.shimmerMeow.root.isVisible = true
                 }
                 else -> Unit
             }
@@ -258,8 +261,6 @@ class CurrentWeatherFragment : Fragment() {
                         requestLocation()
                     } else {
                         Log.d("LOCATING", "LastLocation()  ${it.result}")
-//                        binding.todayTv.text =
-//                            "${it.result.latitude},${it.result.longitude}"
                         userLocation = "${it.result.latitude},${it.result.longitude}"
                         setUpUi(viewModel, userLocation!!)
                     }
@@ -321,19 +322,20 @@ class CurrentWeatherFragment : Fragment() {
                         humidityText.text = current?.humidity.toString()
                         windText.text = current?.windMph.toString()
                         adapter.submitList(response.data?.forecast?.forecastday?.get(0)?.hour)
+                        binding.shimmerMeow.root.isVisible = false
                     }
                 }
                 is Resource.Failure -> {
                     binding.progressBar.visibility = View.GONE
-                    binding.todayTv.isClickable = true
+                    binding.shimmerMeow.root.isVisible = false
                     val text = "${response.msg}--Weather returns null, check network and refresh"
                     makeToast(text)
                 }
                 is Resource.Loading -> {
-                    binding.progressBar.visibility = View.VISIBLE
+                   // binding.progressBar.visibility = View.VISIBLE
+                    binding.shimmerMeow.root.isVisible = true
                     val text = "Loading , Alaye calm down small na"
                     makeToast(text)
-                    binding.todayTv.isClickable = false
                 }
                 else -> Unit
             }

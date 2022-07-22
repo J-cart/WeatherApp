@@ -66,13 +66,15 @@ class SavedWeatherFragment : Fragment() {
                 is Resource.Successful -> {
                     binding.progressBar.isVisible = false
                     adapter.submitList(response.data)
+                    binding.shimmerSaved.root.isVisible = false
                 }
                 is Resource.Failure -> {
                     binding.progressBar.isVisible = false
                     binding.weekTV.text = response.msg
                 }
                 is Resource.Loading -> {
-                    binding.progressBar.isVisible = true
+                   // binding.progressBar.isVisible = true
+                    binding.shimmerSaved.root.isVisible = true
                 }
                 else -> Unit
             }
@@ -86,6 +88,7 @@ class SavedWeatherFragment : Fragment() {
                 is Resource.Successful -> {
                     adapter.submitList(response.data)
                     binding.progressBar.isVisible = false
+                    binding.shimmerSaved.root.isVisible = false
                 }
                 is Resource.Failure -> {
                     binding.progressBar.isVisible = false
@@ -94,7 +97,8 @@ class SavedWeatherFragment : Fragment() {
                     makeToast(text)
                 }
                 is Resource.Loading -> {
-                    binding.progressBar.isVisible = true
+                    //binding.progressBar.isVisible = true
+                    binding.shimmerSaved.root.isVisible = true
                 }
                 else-> Unit
             }
