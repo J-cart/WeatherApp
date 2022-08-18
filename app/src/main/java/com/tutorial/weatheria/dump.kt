@@ -10,12 +10,14 @@ import android.net.Network
 import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import android.os.Build
+import android.provider.Settings
 import android.util.Log
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.ActivityCompat
+import androidx.fragment.app.Fragment
 import androidx.room.TypeConverter
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.gson.Gson
@@ -115,10 +117,12 @@ class cb(val context: Context, val application: AppCompatActivity) {
         CONNECTED,
         DISCONNECTED
     }
+
     class NetworkReceiver : BroadcastReceiver() {
         companion object {
-            var isConnected:NetworkState =  NetworkState.CONNECTED
+            var isConnected: NetworkState = NetworkState.CONNECTED
         }
+
         /*declare this in the activity hosting the fragment then pass it to whichever fragment
         needs it
                // requireActivity().registerReceiver(cb.NetworkReceiver(),(activity as MainActivity).filter)
@@ -129,24 +133,28 @@ class cb(val context: Context, val application: AppCompatActivity) {
                 p0?.getSystemService(ConnectivityManager::class.java) as ConnectivityManager
             val networkCapabilities = manager.getNetworkCapabilities(manager.activeNetwork)
 
-        isConnected = when {
+            isConnected = when {
                 networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true -> {
-                    Log.d("STATE","isConnected")
-                    NetworkState.CONNECTED}
-                networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true ->{
-                    Log.d("STATE","isConnected")
-                    NetworkState.CONNECTED}
+                    Log.d("STATE", "isConnected")
+                    NetworkState.CONNECTED
+                }
+                networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true -> {
+                    Log.d("STATE", "isConnected")
+                    NetworkState.CONNECTED
+                }
                 networkCapabilities?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true -> {
-                    Log.d("STATE","isConnected")
-                    NetworkState.CONNECTED}
-                else->{
-                    Log.d("STATE","Disconnected")
-                    NetworkState.DISCONNECTED}
+                    Log.d("STATE", "isConnected")
+                    NetworkState.CONNECTED
+                }
+                else -> {
+                    Log.d("STATE", "Disconnected")
+                    NetworkState.DISCONNECTED
+                }
             }
         }
     }
 
-    private fun reqNetwork(){
+    private fun reqNetwork() {
         val networkRequest = NetworkRequest.Builder()
             .addCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
             .addTransportType(NetworkCapabilities.TRANSPORT_WIFI)
@@ -173,4 +181,61 @@ class cb(val context: Context, val application: AppCompatActivity) {
 
     }
 
+    /* STUDY UP ON LAUNCHING FROM FRAGMENT
+
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+    resultLauncher.launch(intent)
+
+    var resultLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            // perform check whether Wifi \ NFC \ Internet connection \ Volume
+        }
+    }*/
+
+
+}
+
+@RequiresApi(Build.VERSION_CODES.M)
+fun Fragment.isConnected(networkManager: ConnectivityManager): Boolean {
+    val network = networkManager.getNetworkCapabilities(networkManager.activeNetwork)
+    return network?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true ||
+            network?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true ||
+            network?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true
+}
+
+fun Fragment.makeToast(text: String) {
+    Toast.makeText(
+        requireContext(),
+        text,
+        Toast.LENGTH_SHORT
+    ).show()
+}
+
+fun Fragment.makeAlert(title: String, text: String) {
+    MaterialAlertDialogBuilder(requireContext()).apply {
+        setMessage(text)
+        setTitle(title)
+        setPositiveButton("OK") { dialogInterface, int ->
+            dialogInterface.dismiss()
+        }
+
+        create()
+        show()
+    }
+}
+
+fun Fragment.makeSnackAction(title: String, text: String, action: () -> Unit) {
+    MaterialAlertDialogBuilder(requireContext()).apply {
+        setMessage(text)
+        setTitle(title)
+        setPositiveButton("OK") { dialogInterface, int ->
+            dialogInterface.dismiss()
+            action()
+        }
+
+        create()
+        show()
+    }
 }

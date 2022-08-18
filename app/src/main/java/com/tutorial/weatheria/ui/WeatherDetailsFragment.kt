@@ -10,16 +10,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.navArgs
 import coil.load
-import com.tutorial.weatheria.HourAdapter
+import com.tutorial.weatheria.ui.adapters.HourAdapter
 import com.tutorial.weatheria.R
 import com.tutorial.weatheria.Resource
 import com.tutorial.weatheria.arch.WeatherViewModel
 import com.tutorial.weatheria.databinding.FragmentWeatherDetailsBinding
-import com.tutorial.weatheria.network_and_data_models.Current
-import com.tutorial.weatheria.network_and_data_models.Location
+import com.tutorial.weatheria.makeToast
 import com.tutorial.weatheria.network_and_data_models.SavedWeather
 import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.collect
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -47,6 +45,8 @@ class WeatherDetailsFragment : Fragment() {
         location =
             "${args.locationDetails.lat},${args.locationDetails.lon}" //or betterstill pass the name
         //requireActivity().actionBar?.title = args.locationDetails.name
+        binding.recentsRv.adapter = adapter
+        binding.recentsRv.setHasFixedSize(true)
 
         viewLifecycleOwner.lifecycleScope.launch {
             viewModel.savingEvents.collect { event ->
@@ -82,7 +82,6 @@ class WeatherDetailsFragment : Fragment() {
     private fun setUpUi(viewModel: WeatherViewModel, location: String) {
         viewModel.updateWeatherSearchedLocation(location)
 
-        binding.recentsRv.adapter = adapter
         viewModel.searchLocationWeatherResult.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Successful -> {
@@ -131,11 +130,5 @@ class WeatherDetailsFragment : Fragment() {
         return dateFormat.format(time)
     }
 
-    private fun makeToast(text: String) {
-        Toast.makeText(
-            requireContext(),
-            text,
-            Toast.LENGTH_SHORT
-        ).show()
-    }
+
 }

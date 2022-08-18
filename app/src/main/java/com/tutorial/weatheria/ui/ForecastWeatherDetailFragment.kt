@@ -1,22 +1,31 @@
 package com.tutorial.weatheria.ui
 
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.annotation.RequiresApi
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.viewpager2.adapter.FragmentStateAdapter
-import com.google.android.material.tabs.TabLayoutMediator
+import com.tutorial.weatheria.ui.adapters.DailyForecastAdapter
+import com.tutorial.weatheria.ui.adapters.ForecastAdapter
+import com.tutorial.weatheria.Resource
 import com.tutorial.weatheria.arch.WeatherViewModel
 import com.tutorial.weatheria.databinding.FragmentForecastWeatherDetailBinding
+import com.tutorial.weatheria.isConnected
+import com.tutorial.weatheria.makeToast
 
 class ForecastWeatherDetailFragment : Fragment() {
     private var _binding: FragmentForecastWeatherDetailBinding? = null
     private val binding get() = _binding!!
     private val viewModel: WeatherViewModel by activityViewModels()
+    private val weeklyAdapter: ForecastAdapter by lazy { ForecastAdapter() }
+    private val dailyAdapter: DailyForecastAdapter by lazy { DailyForecastAdapter() }
 
 
     override fun onCreateView(
@@ -31,34 +40,75 @@ class ForecastWeatherDetailFragment : Fragment() {
     @RequiresApi(Build.VERSION_CODES.N)
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        val list = listOf<FragmentListWrapper>(
-            FragmentListWrapper(DailyWeatherDetailsFragment(),"Daily"),
-            FragmentListWrapper(WeeklyWeatherDetailsFragment(),"Weekly")
-        )
+        val networkManager =
+            activity?.getSystemService(ConnectivityManager::class.java) as ConnectivityManager
+        binding.dailyForecastRV.adapter = dailyAdapter
+        binding.dailyForecastRV.setHasFixedSize(true)
 
-        val tabMediator = TabLayoutMediator(binding.tabLayout,binding.viewPager){tab,position->
-            tab.text = list[position].title
+        binding.weeklyForecastRV.adapter = weeklyAdapter
+        binding.weeklyForecastRV.setHasFixedSize(true)
+
+
+
+
+        if (isConnected(networkManager)) {
+            onlineLogic()
+
+        } else {
+            offlineLogic()
         }
-        binding.viewPager.adapter = ViewPagingAdapter(this,list)
-        tabMediator.attach()
+
     }
 
-    class ViewPagingAdapter(fragment: Fragment, private val list:List<FragmentListWrapper>) : FragmentStateAdapter(fragment) {
-        override fun getItemCount(): Int {
-            return list.size
+
+    private fun onlineLogic() {
+        viewModel.weatherForecast.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Resource.Successful -> {
+                    binding.errorStateText.isVisible = false
+                    dailyAdapter.submitList(response.data?.forecast?.forecastday?.get(0)?.hour)
+                    weeklyAdapter.submitList(response.data?.forecast?.forecastday)
+                }
+                is Resource.Failure -> {
+                    binding.errorStateText.isVisible = true
+                    binding.errorStateText.text = response.msg
+                }
+                is Resource.Empty -> {
+                    binding.errorStateText.isVisible = true
+                    binding.errorStateText.text = "LIST IS EMPTY"
+                }
+                else -> Unit
+            }
         }
 
-        override fun createFragment(position: Int): Fragment {
+    }
 
-            return list[position].fragment
-        /*    return when (position) {
-                0 -> list[position].fragment
-                1 -> list[position].fragment
-                else -> throw  IllegalStateException("INVALID POSITION $position")
-            }*/
+    private fun offlineLogic() {
+        viewModel.reportDbSitu()
+        viewModel.situFrmDab.observe(viewLifecycleOwner) { response ->
+            when (response) {
+                is Resource.Successful -> {
+                    binding.errorStateText.isVisible = false
+                    dailyAdapter.submitList(response.data?.forecast?.forecastday?.get(0)?.hour)
+                    weeklyAdapter.submitList(response.data?.forecast?.forecastday)
+                }
+                is Resource.Failure -> {
+                    binding.errorStateText.isVisible = true
+                    val text = "${response.msg}, check network and refresh"
+                    makeToast(text)
+                }
+                is Resource.Loading -> {
+                    binding.errorStateText.isVisible = true
+                    val text = "Please wait a moment..."
+                    makeToast(text)
+                }
+                else -> Unit
+            }
         }
     }
-    data class FragmentListWrapper(val fragment: Fragment,val title:String)
+
+
+
 }
 
 

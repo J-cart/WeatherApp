@@ -1,4 +1,4 @@
-package com.tutorial.weatheria
+package com.tutorial.weatheria.ui.adapters
 
 import android.view.LayoutInflater
 import android.view.View
@@ -6,10 +6,11 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.tutorial.weatheria.R
 import com.tutorial.weatheria.databinding.SearchLocationViewHolderBinding
 import com.tutorial.weatheria.network_and_data_models.SearchLocationResponseItem
 
-class LocationAdapter:ListAdapter<SearchLocationResponseItem,LocationAdapter.ViewHolder>(diffObject) {
+class LocationAdapter:ListAdapter<SearchLocationResponseItem, LocationAdapter.ViewHolder>(diffObject) {
     inner class ViewHolder(view: View):RecyclerView.ViewHolder(view) {
         val binding =SearchLocationViewHolderBinding.bind(view)
         fun bind(location: SearchLocationResponseItem){

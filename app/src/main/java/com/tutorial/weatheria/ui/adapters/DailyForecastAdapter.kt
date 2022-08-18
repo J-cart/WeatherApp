@@ -1,4 +1,4 @@
-package com.tutorial.weatheria
+package com.tutorial.weatheria.ui.adapters
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.tutorial.weatheria.R
 import com.tutorial.weatheria.databinding.DailyForecastViewHolderBinding
 import com.tutorial.weatheria.network_and_data_models.Hour
 
@@ -31,7 +32,7 @@ class DailyForecastAdapter : ListAdapter<Hour, DailyForecastAdapter.ViewHolder2>
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder2 {
         val view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.daily_forecast_view_holder, parent, false)
+            .inflate(R.layout.hourly_weather_view_holder, parent, false)//daily_forecast_view_holder
         return ViewHolder2(view)
     }
 

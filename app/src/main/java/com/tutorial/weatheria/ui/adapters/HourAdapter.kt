@@ -1,4 +1,4 @@
-package com.tutorial.weatheria
+package com.tutorial.weatheria.ui.adapters
 
 import android.util.Log
 import android.view.LayoutInflater
@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import coil.load
+import com.tutorial.weatheria.R
 import com.tutorial.weatheria.databinding.HourlyWeatherViewHolderBinding
 import com.tutorial.weatheria.network_and_data_models.Hour
 

@@ -14,9 +14,11 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import com.tutorial.weatheria.Resource
-import com.tutorial.weatheria.SavedWeatherAdapter
+import com.tutorial.weatheria.ui.adapters.SavedWeatherAdapter
 import com.tutorial.weatheria.arch.WeatherViewModel
 import com.tutorial.weatheria.databinding.FragmentSavedWeatherBinding
+import com.tutorial.weatheria.isConnected
+import com.tutorial.weatheria.makeToast
 
 @SuppressLint("MissingPermission")
 @RequiresApi(Build.VERSION_CODES.N)
@@ -24,6 +26,7 @@ class SavedWeatherFragment : Fragment() {
     private var _binding: FragmentSavedWeatherBinding? = null
     private val binding get() = _binding!!
     private val viewModel: WeatherViewModel by activityViewModels()
+    private lateinit var networkManager:ConnectivityManager
     private val adapter: SavedWeatherAdapter by lazy { SavedWeatherAdapter() }
 
 
@@ -38,21 +41,20 @@ class SavedWeatherFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+         networkManager =
+            activity?.getSystemService(ConnectivityManager::class.java) as ConnectivityManager
 
         binding.forecastRV.adapter = adapter
+        binding.forecastRV.setHasFixedSize(true)
         wholeLogic()
         adapter.adapterClick {
             viewModel.deleteSavedWeather(it).also { adapter.submitList(emptyList()) }
-            if (isConnected()) {
-                onlineLogic()
-            } else {
-                offlineLogic()
-            }
+            wholeLogic()
         }
 
     }
     private fun wholeLogic(){
-        if (isConnected()) {
+        if (isConnected(networkManager)) {
             onlineLogic()
         } else {
             offlineLogic()
@@ -105,20 +107,5 @@ class SavedWeatherFragment : Fragment() {
         }
     }
 
-    private fun makeToast(text: String) {
-        Toast.makeText(
-            requireContext(),
-            text,
-            Toast.LENGTH_SHORT
-        ).show()
-    }
 
-    private fun isConnected(): Boolean {
-        val networkManager =
-            activity?.getSystemService(ConnectivityManager::class.java) as ConnectivityManager
-        val network = networkManager.getNetworkCapabilities(networkManager.activeNetwork)
-        return network?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true ||
-                network?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true ||
-                network?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true
-    }
 }

@@ -6,13 +6,11 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.location.LocationManager
 import android.net.ConnectivityManager
-import android.net.NetworkCapabilities
 import android.os.Build
 import android.os.Bundle
 import android.os.Looper
 import android.util.Log
 import android.view.*
-import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
 import androidx.core.app.ActivityCompat
@@ -23,11 +21,11 @@ import coil.load
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.tutorial.weatheria.HourAdapter
+import com.tutorial.weatheria.*
 import com.tutorial.weatheria.R
-import com.tutorial.weatheria.Resource
 import com.tutorial.weatheria.arch.WeatherViewModel
 import com.tutorial.weatheria.databinding.FragmentCurrentWeatherBinding
+import com.tutorial.weatheria.ui.adapters.HourAdapter
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -49,9 +47,17 @@ class CurrentWeatherFragment : Fragment() {
         return dateFormat.format(time)
     }
 
+    private fun formatDate(date: String): String {
+        val dateFormat = SimpleDateFormat("yy-MM-dd hh:mm", Locale.getDefault())
+        val dateText = dateFormat.parse(date)
+        val dateIndex = dateText?.toString()?.split(" ")
+        val year = "${dateIndex?.get(2)}/${dateIndex?.get(5)?.get(2)}${dateIndex?.get(5)?.get(3)}"
+        return "${dateIndex?.get(0)} - $year  ${dateIndex?.get(3)}"
+    }
+
     // 0:: CHECK PERMISSIONS AT ALL COST...
     // 1 :: check if gps is enables or network provider is enabled----> let it returns true or false
-    //2 :: if 1 returns true  get Last Location -- if its null ---request new one ->3
+    //2 :: if 1 returns true --> get Last Location -- if its null ---request new one ->3
     // 3:: request Location
     private fun checkGps(): Boolean {
         val manager = activity?.getSystemService(Context.LOCATION_SERVICE) as LocationManager
@@ -100,6 +106,7 @@ class CurrentWeatherFragment : Fragment() {
             LocationServices.getFusedLocationProviderClient(requireContext())//FusedLocationProviderClient(requireContext())
 
         binding.recentsRv.adapter = adapter
+        binding.recentsRv.setHasFixedSize(true)
 
         networkManager =
             activity?.getSystemService(ConnectivityManager::class.java) as ConnectivityManager
@@ -112,12 +119,12 @@ class CurrentWeatherFragment : Fragment() {
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        inflater.inflate(R.menu.refresh_menu,menu)
+        inflater.inflate(R.menu.refresh_menu, menu)
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        when(item.itemId){
-            R.id.refreshPage->doNetworkOperation()
+        when (item.itemId) {
+            R.id.refreshPage -> doNetworkOperation()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -154,8 +161,10 @@ class CurrentWeatherFragment : Fragment() {
                         dayTv.text = current?.condition?.text
                         val line = checkDateFormat(System.currentTimeMillis())
                         Log.d("TIME-ING", "$line")
-                        dateTv.text = checkDateFormat(System.currentTimeMillis())
-                        tempText.text = "${ current?.tempC }℃"
+                        dateTv.text =
+                            current?.lastUpdated?.let { formatDate(it) } ?: current?.lastUpdated
+                        //checkDateFormat(System.currentTimeMillis())
+                        tempText.text = "${current?.tempC}℃"
                         humidityText.text = current?.humidity.toString()
                         windText.text = current?.windMph.toString()
                     }
@@ -194,8 +203,9 @@ class CurrentWeatherFragment : Fragment() {
                 }
                 else -> {
                     val title = "ACCEPT PERMISSION REQUEST"
-                    val text = "You need to allow permission for app to work, to enable permission go to app settings and accept or relaunch app"
-                    makeSnack(title, text)
+                    val text =
+                        "You need to allow permission for app to work, to enable permission go to app settings and accept or relaunch app"
+                    makeAlert(title, text)
                 }
             }
         }
@@ -267,10 +277,10 @@ class CurrentWeatherFragment : Fragment() {
 
                 })
         } else {
-            val title =
+            val text =
                 "You need to allow permission for app to work  go to settings to enable permission"
-            val text = "GPS REQUIRED"
-            makeSnack(title, text)
+            val title = "GPS REQUIRED"
+            makeAlert(title, text)
         }
     }
 
@@ -287,7 +297,7 @@ class CurrentWeatherFragment : Fragment() {
     }
 
     private fun doNetworkOperation() {
-        if (isConnected()) {
+        if (isConnected(networkManager)) {
             onlineWholeLogic()
         } else {
             offlineWholeLogic()
@@ -304,12 +314,16 @@ class CurrentWeatherFragment : Fragment() {
             }
         }
     }
-    private fun doOffline(){
+
+    private fun doOffline() {
         viewModel.reportDbSitu()
         viewModel.situFrmDab.observe(viewLifecycleOwner) { response ->
             when (response) {
                 is Resource.Successful -> {
                     val current = response.data?.current
+                    val dateFormat = SimpleDateFormat("yy-MM-dd hh:mm", Locale.getDefault())
+                    val text = dateFormat.parse("2022-02-11 21:45")
+
                     binding.apply {
                         progressBar.visibility = View.GONE
                         todayTv.isClickable = true
@@ -317,7 +331,9 @@ class CurrentWeatherFragment : Fragment() {
                         locationTV.text =
                             response.data?.location?.name// current?.lastUpdated
                         dayTv.text = current?.condition?.text
-                        dateTv.text = checkDateFormat(System.currentTimeMillis())
+                        dateTv.text =
+                            current?.lastUpdated?.let { formatDate(it) }
+                                ?: current?.lastUpdated//checkDateFormat(System.currentTimeMillis())
                         tempText.text = current?.tempC.toString()
                         humidityText.text = current?.humidity.toString()
                         windText.text = current?.windMph.toString()
@@ -332,9 +348,9 @@ class CurrentWeatherFragment : Fragment() {
                     makeToast(text)
                 }
                 is Resource.Loading -> {
-                   // binding.progressBar.visibility = View.VISIBLE
+                    // binding.progressBar.visibility = View.VISIBLE
                     binding.shimmerMeow.root.isVisible = true
-                    val text = "Loading , Alaye calm down small na"
+                    val text = "Loading , Please Wait a moment"
                     makeToast(text)
                 }
                 else -> Unit
@@ -343,31 +359,5 @@ class CurrentWeatherFragment : Fragment() {
 
     }
 
-    private fun isConnected(): Boolean {
-        val network = networkManager.getNetworkCapabilities(networkManager.activeNetwork)
-        return network?.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) == true ||
-                network?.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) == true ||
-                network?.hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET) == true
-    }
-
-    private fun makeToast(text: String) {
-        Toast.makeText(
-            requireContext(),
-            text,
-            Toast.LENGTH_SHORT
-        ).show()
-    }
-
-    private fun makeSnack(title: String, text: String) {
-        MaterialAlertDialogBuilder(requireContext()).apply {
-            setMessage(text)
-            setTitle(title)
-            setPositiveButton("OK") { dialogInterface, int ->
-                dialogInterface.dismiss()
-            }
-            create()
-            show()
-        }
-    }
 }
 

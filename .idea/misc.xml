@@ -19,7 +19,7 @@
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/fragment_weather_details.xml" value="0.264" />
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/fragment_weekly_weather_details.xml" value="0.2557291666666667" />
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/hourly_view_holder.xml" value="0.29501216545012166" />
-        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/hourly_weather_view_holder.xml" value="1.0" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/hourly_weather_view_holder.xml" value="0.536" />
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/saved_weather_viewholder.xml" value="0.4" />
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/search_location_view_holder.xml" value="0.2515625" />
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/shimmer_hourly_weather_view_holder.xml" value="0.2713541666666667" />
@@ -30,7 +30,7 @@
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/testing_today_view_holder.xml" value="0.4" />
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/testing_view_holder.xml" value="0.2557291666666667" />
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/today_view_holder.xml" value="0.2937956204379562" />
-        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/weekly_forecast_view_holder.xml" value="0.16354166666666667" />
+        <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/layout/weekly_forecast_view_holder.xml" value="0.264" />
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/menu/bottom_nav.xml" value="0.2557291666666667" />
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/menu/refresh_favorite_menu.xml" value="0.1" />
         <entry key="..\:/Users/DELL/AndroidStudioProjects/Weatheria/app/src/main/res/menu/refresh_menu.xml" value="0.178125" />

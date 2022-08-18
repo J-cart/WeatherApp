@@ -66,6 +66,8 @@
         android:clipToPadding="false"
         android:orientation="vertical"
         tools:itemCount="5"
+        android:fadeScrollbars="true"
+        android:overScrollMode="ifContentScrolls"
         tools:listitem="@layout/search_location_view_holder"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toBottomOf="parent"
