@@ -1,9 +1,11 @@
 package com.tutorial.weatheria.ui.adapters
 
+import android.os.Build
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.annotation.RequiresApi
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
@@ -12,22 +14,18 @@ import com.tutorial.weatheria.R
 import com.tutorial.weatheria.databinding.SavedWeatherViewholderBinding
 import com.tutorial.weatheria.network_and_data_models.SavedWeather
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
-
+@RequiresApi(Build.VERSION_CODES.O)
 class SavedWeatherAdapter : ListAdapter<SavedWeather, SavedWeatherAdapter.ViewHolder>(diffObject) {
     inner class ViewHolder(view: View) : RecyclerView.ViewHolder(view) {
         val binding = SavedWeatherViewholderBinding.bind(view)
         fun bind(savedWeather: SavedWeather) {
             binding.apply {
-                val dateFormat = SimpleDateFormat("yy-MM-dd hh:mm", Locale.getDefault())
-                val text = savedWeather.current?.lastUpdated?.let { dateFormat.parse(it) }
-                val dateIndex = text.toString().split(" ")
-
-                Log.d("sme", "${savedWeather.current?.lastUpdated}")
-                Log.d("sme", "$dateIndex")
 
                 dateTV.text =
-                    savedWeather.current?.lastUpdated?.let { formatDate(it) }//savedWeather.current?.lastUpdated
+                    savedWeather.current?.lastUpdated?.let { getDateFormat(it) }//savedWeather.current?.lastUpdated
                 location.text = savedWeather.location?.name
                 condition.text = savedWeather.current?.condition?.text
                 tempC.text = "${savedWeather.current?.tempC}℃"
@@ -75,11 +73,14 @@ class SavedWeatherAdapter : ListAdapter<SavedWeather, SavedWeatherAdapter.ViewHo
             holder.bind(pos)
     }
 
-    private fun formatDate(date: String): String {
-        val dateFormat = SimpleDateFormat("yy-MM-dd hh:mm", Locale.getDefault())
-        val dateText = dateFormat.parse(date)
-        val dateIndex = dateText?.toString()?.split(" ")
-        val year = "${dateIndex?.get(2)}/${dateIndex?.get(5)?.get(2)}${dateIndex?.get(5)?.get(3)}"
-        return "${dateIndex?.get(0)} - $year"
+
+
+
+    private  fun getDateFormat(date: String):String{
+        val format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        val localDate = LocalDateTime.parse(date, format)
+
+        val dateFormatter = DateTimeFormatter.ofPattern("EEE, MMM d", Locale.getDefault())
+        return localDate.format(dateFormatter)
     }
 }
