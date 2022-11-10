@@ -8,7 +8,8 @@
 </br>
 
 
-
+## Demo
+   https://user-images.githubusercontent.com/82452881/201215907-6978ac12-0eb0-4367-9f6c-43efa3832344.mp4
 ## Download
  Coming Soon .....
 <img src="/previews/preview.gif" align="right" width="320"/>
@@ -32,6 +33,8 @@
 - [Coil](https://github.com/coil-kt/coil): Loading images from network.
 - Custom Views
   - [Shimmer View](https://github.com/facebook/shimmer-android): An easy, flexible way to add a shimmering effect to any view in an Android app.
+- **API** 
+  - [Weather Api](http://api.weatherapi.com/v1/): WeatherAPI provides access to weather and geo data via a JSON/XML restful API. It allows developers to create desktop, web and mobile applications using this data very easy.
 
 ## Architecture
 **Weatheria** is based on the MVVM architecture and the Repository pattern, which follows the [Google's official architecture guidance](https://developer.android.com/topic/architecture).
@@ -60,3 +63,7 @@ The data Layer consists of repositories, which include business logic, such as q
 
 **Weatheria** is an offline functional app that is able to perform some all of its core functionality without access to the internet. 
 So users don't need to be up-to-date on the network resources every time and it will decrease users' data consumption. For further information, you can check out [Build an offline-first app](https://developer.android.com/topic/architecture/data-layer/offline-first).
+
+
+
+
