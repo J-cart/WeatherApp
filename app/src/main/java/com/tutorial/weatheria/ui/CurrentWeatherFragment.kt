@@ -43,7 +43,7 @@ class CurrentWeatherFragment : Fragment() {
 
 
     private fun checkDateFormat(time: Long): String {
-        val dateFormat = SimpleDateFormat("yy-MM-dd hh:mm:ss", Locale.getDefault())
+        val dateFormat = SimpleDateFormat("yy-MM-dd hh:mm aa", Locale.getDefault())
         return dateFormat.format(time)
     }
 
@@ -53,6 +53,13 @@ class CurrentWeatherFragment : Fragment() {
         val dateIndex = dateText?.toString()?.split(" ")
         val year = "${dateIndex?.get(2)}/${dateIndex?.get(5)?.get(2)}${dateIndex?.get(5)?.get(3)}"
         return "${dateIndex?.get(0)} - $year  ${dateIndex?.get(3)}"
+    }
+
+    private  fun getDateFormat(date: String):String{
+        val dateFormat = SimpleDateFormat("yy-MM-dd hh:mm", Locale.getDefault())
+        val dateText = dateFormat.parse(date)
+        val dateIndex = dateText?.toString()?.split(" ")
+        return "${dateIndex?.get(0)},${dateIndex?.get(2)} ${dateIndex?.get(1)}-${dateIndex?.get(3)}"
     }
 
     // 0:: CHECK PERMISSIONS AT ALL COST...
@@ -162,7 +169,7 @@ class CurrentWeatherFragment : Fragment() {
                         val line = checkDateFormat(System.currentTimeMillis())
                         Log.d("TIME-ING", "$line")
                         dateTv.text =
-                            current?.lastUpdated?.let { formatDate(it) } ?: current?.lastUpdated
+                            current?.lastUpdated?.let { getDateFormat(it) } ?: current?.lastUpdated
                         //checkDateFormat(System.currentTimeMillis())
                         tempText.text = "${current?.tempC}℃"
                         humidityText.text = current?.humidity.toString()
@@ -321,8 +328,6 @@ class CurrentWeatherFragment : Fragment() {
             when (response) {
                 is Resource.Successful -> {
                     val current = response.data?.current
-                    val dateFormat = SimpleDateFormat("yy-MM-dd hh:mm", Locale.getDefault())
-                    val text = dateFormat.parse("2022-02-11 21:45")
 
                     binding.apply {
                         progressBar.visibility = View.GONE
@@ -332,7 +337,7 @@ class CurrentWeatherFragment : Fragment() {
                             response.data?.location?.name// current?.lastUpdated
                         dayTv.text = current?.condition?.text
                         dateTv.text =
-                            current?.lastUpdated?.let { formatDate(it) }
+                            current?.lastUpdated?.let { getDateFormat(it) }
                                 ?: current?.lastUpdated//checkDateFormat(System.currentTimeMillis())
                         tempText.text = current?.tempC.toString()
                         humidityText.text = current?.humidity.toString()
