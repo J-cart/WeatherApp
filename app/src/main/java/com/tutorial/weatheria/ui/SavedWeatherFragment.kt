@@ -72,7 +72,7 @@ class SavedWeatherFragment : Fragment() {
                 }
                 is Resource.Failure -> {
                     binding.progressBar.isVisible = false
-                    binding.weekTV.text = response.msg
+//                    binding.weekTV.text = response.msg
                 }
                 is Resource.Loading -> {
                    // binding.progressBar.isVisible = true
@@ -94,7 +94,7 @@ class SavedWeatherFragment : Fragment() {
                 }
                 is Resource.Failure -> {
                     binding.progressBar.isVisible = false
-                    binding.weekTV.text = "${response.msg} ,check network/Db"
+//                    binding.weekTV.text = "${response.msg} ,check network/Db"
                     val text = "${response.msg}, check network and refresh"
                     makeToast(text)
                 }

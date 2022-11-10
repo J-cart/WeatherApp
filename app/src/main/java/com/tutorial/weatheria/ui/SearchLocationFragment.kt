@@ -65,6 +65,7 @@ class SearchLocationFragment : Fragment() {
                     adapter.submitList(response.data)
                 }
                 is Resource.Failure -> {
+                    binding.locationRv.isVisible= false
                     binding.progressBar.isVisible = false
                     binding.errorText.isVisible = true
                     binding.errorText.text = response.msg

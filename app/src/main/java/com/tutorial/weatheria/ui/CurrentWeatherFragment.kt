@@ -23,13 +23,16 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.tutorial.weatheria.*
 import com.tutorial.weatheria.R
+import com.tutorial.weatheria.R.*
 import com.tutorial.weatheria.arch.WeatherViewModel
 import com.tutorial.weatheria.databinding.FragmentCurrentWeatherBinding
 import com.tutorial.weatheria.ui.adapters.HourAdapter
 import java.text.SimpleDateFormat
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
-@RequiresApi(Build.VERSION_CODES.N)
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("MissingPermission")
 class CurrentWeatherFragment : Fragment() {
     private var _binding: FragmentCurrentWeatherBinding? = null
@@ -42,24 +45,13 @@ class CurrentWeatherFragment : Fragment() {
     private lateinit var networkManager: ConnectivityManager
 
 
-    private fun checkDateFormat(time: Long): String {
-        val dateFormat = SimpleDateFormat("yy-MM-dd hh:mm aa", Locale.getDefault())
-        return dateFormat.format(time)
-    }
-
-    private fun formatDate(date: String): String {
-        val dateFormat = SimpleDateFormat("yy-MM-dd hh:mm", Locale.getDefault())
-        val dateText = dateFormat.parse(date)
-        val dateIndex = dateText?.toString()?.split(" ")
-        val year = "${dateIndex?.get(2)}/${dateIndex?.get(5)?.get(2)}${dateIndex?.get(5)?.get(3)}"
-        return "${dateIndex?.get(0)} - $year  ${dateIndex?.get(3)}"
-    }
 
     private  fun getDateFormat(date: String):String{
-        val dateFormat = SimpleDateFormat("yy-MM-dd hh:mm", Locale.getDefault())
-        val dateText = dateFormat.parse(date)
-        val dateIndex = dateText?.toString()?.split(" ")
-        return "${dateIndex?.get(0)},${dateIndex?.get(2)} ${dateIndex?.get(1)}-${dateIndex?.get(3)}"
+        val format = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")
+        val localDate = LocalDateTime.parse(date, format)
+
+        val dateFormatter = DateTimeFormatter.ofPattern("EEE, MMM d, hh:mm a", Locale.getDefault())
+        return localDate.format(dateFormatter)
     }
 
     // 0:: CHECK PERMISSIONS AT ALL COST...
@@ -105,7 +97,6 @@ class CurrentWeatherFragment : Fragment() {
         setHasOptionsMenu(true)
         return binding.root
     }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -153,7 +144,6 @@ class CurrentWeatherFragment : Fragment() {
             LocationServices.getFusedLocationProviderClient(requireContext())//FusedLocationProviderClient(requireContext())
 
     }
-
     private fun setUpUi(viewModel: WeatherViewModel, location: String) {
         viewModel.updateWeather(location)
         adapter.submitList(emptyList())
@@ -166,8 +156,6 @@ class CurrentWeatherFragment : Fragment() {
                         weatherIcon.load("http:${current?.condition?.icon}")
                         locationTV.text = response.data?.location?.name// current?.lastUpdated
                         dayTv.text = current?.condition?.text
-                        val line = checkDateFormat(System.currentTimeMillis())
-                        Log.d("TIME-ING", "$line")
                         dateTv.text =
                             current?.lastUpdated?.let { getDateFormat(it) } ?: current?.lastUpdated
                         //checkDateFormat(System.currentTimeMillis())
@@ -269,7 +257,6 @@ class CurrentWeatherFragment : Fragment() {
             show()
         }
     }
-
     private fun runGpsAndMainOperation() {
         if (checkGps()) {
             fusedLocationProviderClient.lastLocation.addOnCompleteListener(
@@ -291,7 +278,6 @@ class CurrentWeatherFragment : Fragment() {
         }
     }
 
-
     private fun onlineWholeLogic() {
         when (checkPerms()) {
             true -> {
@@ -302,7 +288,6 @@ class CurrentWeatherFragment : Fragment() {
             }
         }
     }
-
     private fun doNetworkOperation() {
         if (isConnected(networkManager)) {
             onlineWholeLogic()
@@ -310,7 +295,6 @@ class CurrentWeatherFragment : Fragment() {
             offlineWholeLogic()
         }
     }
-
     private fun offlineWholeLogic() {
         when (checkPerms()) {
             true -> {
@@ -321,7 +305,6 @@ class CurrentWeatherFragment : Fragment() {
             }
         }
     }
-
     private fun doOffline() {
         viewModel.reportDbSitu()
         viewModel.situFrmDab.observe(viewLifecycleOwner) { response ->
