@@ -58,5 +58,5 @@ The UI layer consists of UI elements to configure screens that could interact wi
 
 The data Layer consists of repositories, which include business logic, such as querying data from the local database and requesting remote data from the network. It is implemented as an offline-first source of business logic and follows the [single source of truth](https://en.wikipedia.org/wiki/Single_source_of_truth) principle.<br>
 
-**weatheria** is an offline-first app is an app that is able to perform some all of its core functionality without access to the internet. 
+**Weatheria** is an offline functional app that is able to perform some all of its core functionality without access to the internet. 
 So users don't need to be up-to-date on the network resources every time and it will decrease users' data consumption. For further information, you can check out [Build an offline-first app](https://developer.android.com/topic/architecture/data-layer/offline-first).
