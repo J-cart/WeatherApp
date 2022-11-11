@@ -55,7 +55,7 @@ With this loosely coupled architecture, you can increase the reusability of comp
 
 The UI layer consists of UI elements to configure screens that could interact with users and [ViewModel](https://developer.android.com/topic/libraries/architecture/viewmodel) that holds app states and restores data when configuration changes.
 - UI elements observe the data flow via [View Binding](https://developer.android.com/topic/libraries/view-binding), which is the most essential part of the MVVM architecture. 
-- With [Bindables](https://github.com/skydoves/bindables), which is an Android DataBinding kit for notifying data changes, you can implement two-way binding, and data observation in XML very clean.
+- With [View binding](https://developer.android.com/topic/libraries/view-binding), which is an Android DataBinding kit for notifying data changes.
 
 ### Data Layer
 
