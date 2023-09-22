@@ -3,7 +3,7 @@
 
 
 <p align="center">  
-🌥 Weatheria demonstrates modern Android development with Hilt, Coroutines, Flow, Jetpack (Room, ViewModel), and Material Design based on MVVM architecture.
+🌥 Weatheria is a weather forecast application demonstrates modern Android development with Hilt, Coroutines, Flow, Jetpack (Room, ViewModel), and Material Design based on MVVM architecture.
 </p>
 </br>
 
